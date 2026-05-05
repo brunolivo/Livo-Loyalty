@@ -504,11 +504,12 @@ export default function LoyaltyPage() {
 
                 <div className="perks-matrix">
                   {tierDefs.map((tier, ti) => {
-                    const tierReqs: Record<string,string> = {
+                    const TIER_REQS: Record<string, Record<string, string>> = {
                       ENF:  { Starter:'1–19 turnos', Silver:'20–49 turnos', Gold:'50–99 turnos', Platinum:'100+ turnos' },
                       TCAE: { Starter:'1–9 turnos',  Silver:'10–24 turnos', Gold:'25–49 turnos', Platinum:'50+ turnos'  },
                       DOC:  { Starter:'1–2 turnos',  Silver:'3–5 turnos',   Gold:'6–10 turnos',  Platinum:'11+ turnos'  },
-                    }[cluster]?.[tier.name] ?? ''
+                    }
+                    const tierReqs = TIER_REQS[cluster]?.[tier.name] ?? ''
 
                     return (
                       <div key={tier.name} className="perk-tier-card" style={{ '--tc': tier.color } as React.CSSProperties}>
