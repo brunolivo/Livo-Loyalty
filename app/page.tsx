@@ -148,6 +148,55 @@ const css = `
   .spinner { width: 20px; height: 20px; border: 2px solid #e8f0f3; border-top-color: #86D2AC; border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .error-box { background: #fff0f0; border: 1px solid #ffcccc; border-radius: 12px; padding: 20px 24px; color: #c0392b; font-size: 14px; margin-bottom: 24px; }
+
+  /* CONSISTENCY BADGE */
+  .consistent-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px;
+    background: linear-gradient(135deg, #ff6b35, #f7c59f);
+    color: #fff; margin-left: 6px; vertical-align: middle;
+    box-shadow: 0 1px 4px rgba(255,107,53,0.35); letter-spacing: 0.2px;
+  }
+
+  /* CONSISTENCY BENEFIT CARD */
+  .consistency-banner {
+    background: linear-gradient(135deg, #104455 0%, #1d6278 50%, #357382 100%);
+    border-radius: 16px; padding: 28px 32px; margin-bottom: 28px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 4px 20px rgba(16,68,85,0.2);
+  }
+  .consistency-banner::before {
+    content: '⚡';
+    position: absolute; right: 28px; top: 50%; transform: translateY(-50%);
+    font-size: 80px; opacity: 0.08; pointer-events: none;
+  }
+  .consistency-banner-title {
+    font-size: 11px; font-weight: 600; letter-spacing: 1px;
+    text-transform: uppercase; color: #86D2AC; margin-bottom: 6px;
+  }
+  .consistency-banner-headline {
+    font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 8px; line-height: 1.2;
+  }
+  .consistency-banner-sub {
+    font-size: 13px; color: rgba(255,255,255,0.65); margin-bottom: 20px;
+  }
+  .consistency-stat {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    background: rgba(134,210,172,0.15); border: 1px solid rgba(134,210,172,0.3);
+    border-radius: 10px; padding: 8px 16px; margin-right: 10px; margin-bottom: 8px;
+  }
+  .consistency-stat-val { font-size: 22px; font-weight: 700; color: #86D2AC; }
+  .consistency-stat-label { font-size: 12px; color: rgba(255,255,255,0.6); }
+  .consistency-perks-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-top: 0; }
+  .consistency-perk-card {
+    background: #fff; border-radius: 14px; padding: 18px;
+    box-shadow: 0 2px 12px rgba(16,68,85,0.06);
+    border-top: 3px solid #ff6b35;
+  }
+  .consistency-perk-icon { font-size: 24px; margin-bottom: 8px; }
+  .consistency-perk-title { font-size: 13px; font-weight: 700; color: #104455; margin-bottom: 4px; }
+  .consistency-perk-detail { font-size: 12px; color: #5a7a84; line-height: 1.4; }
+  .consistency-leaderboard { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(16,68,85,0.06); overflow: hidden; margin-top: 20px; }
 `
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -160,9 +209,14 @@ type ClusterStats = {
   category_code: string; active_pros: number
   total_shifts: number; avg_payment_per_shift: number; total_earnings: number
 }
+type ConsistentPro = {
+  category_code: string; professional_id: number
+  first_name: string; last_name: string
+  total_shifts: number; weeks_active: number; avg_weekly_shifts: number
+}
 type LoyaltyData = {
   leaderboard: Professional[]; stats: ClusterStats[]
-  monthly: unknown[]; fetchedAt: string
+  monthly: unknown[]; consistent: ConsistentPro[]; fetchedAt: string
 }
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -333,6 +387,9 @@ export default function LoyaltyPage() {
   const totalPros = allStats.reduce((a, s) => a + Number(s.active_pros), 0)
   const totalShifts = allStats.reduce((a, s) => a + Number(s.total_shifts), 0)
   const totalEarnings = allStats.reduce((a, s) => a + Number(s.total_earnings), 0)
+  const allConsistent = data?.consistent ?? []
+  const clusterConsistent = allConsistent.filter((p) => p.category_code === cluster)
+  const consistentIds = new Set(clusterConsistent.map((p) => p.professional_id))
 
   const tierDefs = TIERS[cluster]
   const tierBreakdown = tierDefs.map((tier) => ({
@@ -366,7 +423,7 @@ export default function LoyaltyPage() {
         ) : data && (
           <>
             {/* ── Summary ── */}
-            <div className="summary-grid">
+            <div className="summary-grid" style={{ gridTemplateColumns: 'repeat(4,1fr)' }}>
               <div className="summary-card">
                 <div className="summary-card-label">Profesionales Activos</div>
                 <div className="summary-card-value">{fmt(totalPros)}</div>
@@ -381,6 +438,11 @@ export default function LoyaltyPage() {
                 <div className="summary-card-label">Ingresos Totales Pros</div>
                 <div className="summary-card-value">{fmtEur(totalEarnings)}</div>
                 <div className="summary-card-sub">pagado a profesionales</div>
+              </div>
+              <div className="summary-card" style={{ borderLeftColor: '#ff6b35' }}>
+                <div className="summary-card-label">⚡ Pros Consistentes</div>
+                <div className="summary-card-value">{fmt(allConsistent.length)}</div>
+                <div className="summary-card-sub" style={{ color: '#ff6b35' }}>≥ 2 turnos/semana</div>
               </div>
             </div>
 
@@ -480,7 +542,12 @@ export default function LoyaltyPage() {
                     return (
                       <div key={pro.professional_id} className="lb-row">
                         <span className="rank">{medal ?? `${i + 1}`}</span>
-                        <span className="pro-name">{pro.first_name} {pro.last_name}</span>
+                        <span className="pro-name">
+                          {pro.first_name} {pro.last_name}
+                          {consistentIds.has(pro.professional_id) && (
+                            <span className="consistent-badge">⚡ Consistente</span>
+                          )}
+                        </span>
                         <span className="shifts-val">{fmt(Number(pro.shifts_completed))}</span>
                         <span className="earnings-val">{fmtEur(Number(pro.total_earned))}</span>
                         <span>
@@ -498,7 +565,75 @@ export default function LoyaltyPage() {
             {/* ══════════════════ VIEW: BENEFICIOS ══════════════════ */}
             {view === 'beneficios' && (
               <>
-                <div className="section-title">Beneficios & Partnerships por Tier</div>
+                {/* ── Consistency bonus banner ── */}
+                <div className="consistency-banner">
+                  <div className="consistency-banner-title">⚡ Bono Exclusivo · Disponible para todos los tiers</div>
+                  <div className="consistency-banner-headline">Bono Consistencia — 2 turnos por semana</div>
+                  <div className="consistency-banner-sub">
+                    Completa una media de 2 turnos semanales y desbloquea beneficios extra acumulables a tu tier actual.
+                  </div>
+                  <div style={{ marginBottom: 20 }}>
+                    <span className="consistency-stat">
+                      <span className="consistency-stat-val">{fmt(clusterConsistent.length)}</span>
+                      <span className="consistency-stat-label">pros activos con bono en este cluster</span>
+                    </span>
+                    <span className="consistency-stat">
+                      <span className="consistency-stat-val">
+                        {clusterConsistent.length > 0
+                          ? `${Math.round(clusterConsistent.reduce((a, p) => a + Number(p.avg_weekly_shifts), 0) / clusterConsistent.length * 10) / 10}`
+                          : '—'}
+                      </span>
+                      <span className="consistency-stat-label">media turnos/semana del grupo</span>
+                    </span>
+                  </div>
+                  <div className="consistency-perks-grid">
+                    {[
+                      { icon: '💰', title: '+3% extra en tarifa', detail: 'Se acumula al bonus de tu tier (Gold = +8% tier + 3% consistencia = +11% total).' },
+                      { icon: '🔄', title: 'Swap sin penalización', detail: 'Cambia hasta 2 turnos al mes sin perder el slot ni la valoración.' },
+                      { icon: '🎯', title: 'Account Manager propio', detail: 'Acceso directo a un AM dedicado de Livo para gestión prioritaria.' },
+                      { icon: '🏆', title: 'Reconocimiento mensual', detail: 'Mención en el ranking especial de Consistencia + regalo sorpresa mensual de Livo.' },
+                    ].map((p) => (
+                      <div key={p.title} className="consistency-perk-card">
+                        <div className="consistency-perk-icon">{p.icon}</div>
+                        <div className="consistency-perk-title">{p.title}</div>
+                        <div className="consistency-perk-detail">{p.detail}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {clusterConsistent.length > 0 && (
+                  <>
+                    <div className="section-title">Profesionales con Bono ⚡ Activo</div>
+                    <div className="consistency-leaderboard" style={{ marginBottom: 32 }}>
+                      <div className="lb-header">
+                        <span>#</span><span>Profesional</span>
+                        <span>Turnos (12m)</span><span>Media semanal</span><span>Tier</span>
+                      </div>
+                      {clusterConsistent.slice(0, 20).map((pro, i) => {
+                        const tier = getTier(cluster, Number(pro.total_shifts))
+                        return (
+                          <div key={pro.professional_id} className="lb-row">
+                            <span className="rank">{i + 1}</span>
+                            <span className="pro-name">
+                              {pro.first_name} {pro.last_name}
+                              <span className="consistent-badge">⚡ Consistente</span>
+                            </span>
+                            <span className="shifts-val">{fmt(Number(pro.total_shifts))}</span>
+                            <span className="earnings-val">{Number(pro.avg_weekly_shifts).toFixed(1)} / sem</span>
+                            <span>
+                              <span className="tier-pill" style={{ '--tc': tier.color, '--tb': tier.bg } as React.CSSProperties}>
+                                {tier.icon} {tier.name}
+                              </span>
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </>
+                )}
+
+                <div className="section-title">Beneficios por Tier</div>
                 <div className="section-sub">Cuanto mayor sea tu tier, mayores son los descuentos y el acceso exclusivo a partners.</div>
                 <div className="cat-note" dangerouslySetInnerHTML={{ __html: CAT_NOTES[cluster] }} />
 

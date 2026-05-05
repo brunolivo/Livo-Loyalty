@@ -51,14 +51,37 @@ GROUP BY pp.category_code, month
 ORDER BY pp.category_code, month ASC
 `
 
+// Professionals who average ≥ 2 shifts/week over the last 12 months
+// and have been active for at least 4 weeks (to exclude flukes)
+const CONSISTENT_SQL = `
+SELECT
+  pp.category_code,
+  psc.professional_id,
+  u.first_name,
+  u.last_name,
+  COUNT(psc.id) as total_shifts,
+  ROUND(DATEDIFF(NOW(), MIN(psc.start_time_utc)) / 7, 1) as weeks_active,
+  ROUND(COUNT(psc.id) / (DATEDIFF(NOW(), MIN(psc.start_time_utc)) / 7), 2) as avg_weekly_shifts
+FROM professional_shift_claim psc
+JOIN professional_profile pp ON pp.professional_id = psc.professional_id
+JOIN user u ON u.id = psc.professional_id
+WHERE psc.status = 'APPROVED'
+  AND pp.category_code IN ('ENF', 'TCAE', 'DOC')
+  AND psc.start_time_utc >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+GROUP BY pp.category_code, psc.professional_id, u.first_name, u.last_name
+HAVING avg_weekly_shifts >= 2 AND weeks_active >= 4
+ORDER BY pp.category_code, avg_weekly_shifts DESC
+`
+
 export async function GET() {
   try {
-    const [leaderboard, stats, monthly] = await Promise.all([
+    const [leaderboard, stats, monthly, consistent] = await Promise.all([
       executeQuery(LEADERBOARD_SQL),
       executeQuery(STATS_SQL),
       executeQuery(MONTHLY_SQL),
+      executeQuery(CONSISTENT_SQL),
     ])
-    return NextResponse.json({ leaderboard, stats, monthly, fetchedAt: new Date().toISOString() })
+    return NextResponse.json({ leaderboard, stats, monthly, consistent, fetchedAt: new Date().toISOString() })
   } catch (err) {
     console.error('Loyalty API error:', err)
     return NextResponse.json({ error: 'Failed to fetch loyalty data' }, { status: 500 })
