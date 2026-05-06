@@ -96,13 +96,13 @@ const css = `
   /* ── Leaderboard ── */
   .leaderboard { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(16,68,85,0.06); overflow: hidden; }
   .lb-header {
-    display: grid; grid-template-columns: 44px 1fr 90px 110px 90px 110px;
+    display: grid; grid-template-columns: 44px 1fr 90px 110px 90px 90px 110px;
     padding: 11px 20px; background: #F2F7F9;
     font-size: 10px; font-weight: 700; color: #5a7a84;
     text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid #e8f0f3;
   }
   .lb-row {
-    display: grid; grid-template-columns: 44px 1fr 90px 110px 90px 110px;
+    display: grid; grid-template-columns: 44px 1fr 90px 110px 90px 90px 110px;
     padding: 12px 20px; border-bottom: 1px solid #f0f5f7;
     align-items: center; transition: background 0.1s;
   }
@@ -306,7 +306,29 @@ const css = `
   .pm-locked { font-size:11px; font-weight:600; color:#D4A017; }
   .pm-locked-shifts { font-size:10px; color:#9db5bc; margin-top:1px; }
   .pm-none { font-size:20px; color:#e8eff2; }
+  .pm-bracket-leader { font-size:13px; font-weight:700; color:#104455; line-height:1.3; margin-bottom:2px; }
+  .pm-bracket-shifts { font-size:11px; color:var(--pc); font-weight:600; }
+  .pm-bracket-count { font-size:10px; color:#9db5bc; margin-top:3px; }
+  .pm-bracket-empty { font-size:20px; color:#e8eff2; }
   .prize-note { font-size:11px; color:#9db5bc; text-align:center; padding:4px 0; }
+
+  /* ── Clasificados por Nivel ── */
+  .prize-classified { margin-top:20px; }
+  .prize-classified-title { font-size:15px; font-weight:700; color:#104455; margin-bottom:4px; }
+  .prize-classified-sub { font-size:13px; color:#5a7a84; margin-bottom:16px; }
+  .prize-class-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  .prize-class-card { background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 2px 12px rgba(16,68,85,0.06); border-top:3px solid var(--pc); }
+  .prize-class-card-header { padding:12px 16px 10px; border-bottom:1px solid #f0f5f7; display:flex; align-items:center; gap:8px; }
+  .prize-class-card-icon { font-size:18px; }
+  .prize-class-card-level { font-size:14px; font-weight:800; color:var(--pc); }
+  .prize-class-card-range { font-size:10px; color:#9db5bc; margin-top:1px; }
+  .prize-class-card-count { margin-left:auto; font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; background:var(--pc-bg); color:var(--pc); }
+  .prize-class-pro-row { display:grid; grid-template-columns:22px 1fr auto; align-items:center; padding:8px 16px; border-bottom:1px solid #f6f9fa; gap:8px; }
+  .prize-class-pro-row:last-child { border-bottom:none; }
+  .prize-class-pos { font-size:11px; font-weight:700; color:#9db5bc; }
+  .prize-class-name { font-size:12px; font-weight:600; color:#104455; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .prize-class-shifts { font-size:12px; font-weight:700; color:var(--pc); white-space:nowrap; }
+  .prize-class-empty { padding:20px 16px; font-size:12px; color:#9db5bc; text-align:center; }
 
   /* ── Marketplace ── */
   .market-banner {
@@ -1092,98 +1114,135 @@ export default function LoyaltyPage() {
                   const allLb = data?.leaderboard ?? []
                   const allConsistentSet = new Set((data?.consistent ?? []).map(p => p.professional_id))
 
-                  const clusterLeaders = CLUSTERS.map(c => {
-                    const top = allLb
+                  // Per cluster: compute bracket leaders and classified lists
+                  const clusterBracketData = CLUSTERS.map(c => {
+                    const pros = allLb
                       .filter(p => p.category_code === c.code)
-                      .map(p => ({ ...p, effectiveLP: computeLP(p, allConsistentSet.has(p.professional_id)) }))
-                      .sort((a, b) => b.effectiveLP - a.effectiveLP)[0] ?? null
-                    const shifts = top ? Number(top.shifts_completed) : 0
-                    return { ...c, pro: top, shifts, prize: getAnnualPrize(shifts) }
+                      .map(p => ({ ...p, shifts: Number(p.shifts_completed), effectiveLP: computeLP(p, allConsistentSet.has(p.professional_id)) }))
+                      .sort((a, b) => b.shifts - a.shifts)
+
+                    const brackets = ANNUAL_PRIZES.map((prize, i) => {
+                      const nextMin = ANNUAL_PRIZES[i + 1]?.minShifts ?? Infinity
+                      const inBracket = pros.filter(p => p.shifts >= prize.minShifts && p.shifts < nextMin)
+                      return { prize, pros: inBracket, leader: inBracket[0] ?? null }
+                    })
+
+                    return { code: c.code, icon: c.icon, label: c.label, brackets }
                   })
 
-                  // prize highlighted on the tier cards = current cluster's leader
-                  const leaderPrize = clusterLeaders.find(c => c.code === cluster)?.prize ?? null
+                  // Classified list for the currently selected cluster
+                  const currentClusterBrackets = clusterBracketData.find(c => c.code === cluster)?.brackets ?? []
 
                   return (
                     <div className="prize-section">
                       <div className="prize-hero">
                         <div className="prize-hero-tag">🏆 Premio Anual · Clasificación Final</div>
-                        <div className="prize-hero-title">Top #1 del Año — Recompensa por Actividad</div>
+                        <div className="prize-hero-title">Top #1 por Nivel — Recompensa por Actividad</div>
                         <div className="prize-hero-sub">
-                          El profesional #1 de cada categoría al cierre del período anual recibe un presupuesto de recompensa proporcional al revenue generado. Cuantos más turnos, mayor el nivel y el premio.
+                          Cada nivel muestra el profesional líder dentro de ese rango de turnos. El profesional #1 de cada categoría al cierre del período anual recibe un presupuesto de recompensa proporcional al revenue generado.
                         </div>
                       </div>
 
                       {/* Matrix table */}
                       <div className="prize-matrix">
-                        {/* Header row — category leaders */}
+                        {/* Header row — category labels */}
                         <div className="pm-row pm-header">
                           <div className="pm-corner">
-                            <span className="pm-corner-label">Nivel · Requisito</span>
+                            <span className="pm-corner-label">Nivel · Rango</span>
                           </div>
-                          {clusterLeaders.map(cl => (
+                          {clusterBracketData.map(cl => (
                             <div key={cl.code} className="pm-cat-cell">
                               <div className="pm-cat-cluster">{cl.icon} {cl.label}</div>
-                              {cl.pro ? (
-                                <>
-                                  <div className="pm-cat-name">{cl.pro.first_name} {cl.pro.last_name}</div>
-                                  <div className="pm-cat-shifts">{fmt(cl.shifts)} turnos · {periodShort}</div>
-                                </>
-                              ) : (
-                                <div className="pm-cat-shifts">Sin datos</div>
-                              )}
+                              <div className="pm-cat-shifts">#1 por nivel · {periodShort}</div>
                             </div>
                           ))}
                         </div>
 
                         {/* One row per prize level */}
-                        {ANNUAL_PRIZES.map(p => (
-                          <div key={p.level} className="pm-row">
-                            {/* Level info cell */}
-                            <div className="pm-level-cell" style={{ '--pc': p.color, '--pc-bg': p.bg } as React.CSSProperties}>
-                              <div className="pm-level-name">{p.icon} {p.level}</div>
-                              <div className="pm-level-req">≥ {p.minShifts} turnos</div>
-                              <div className="pm-level-stats">
-                                <span className="pm-stat-chip">Rev. {fmtEur(p.revenue)}</span>
-                                <span className="pm-stat-chip">Premio {fmtEur(p.budget)}</span>
-                                <span className="pm-stat-chip">{p.pct}%</span>
-                              </div>
-                            </div>
-
-                            {/* Status cell per category */}
-                            {clusterLeaders.map(cl => {
-                              const shifts = cl.shifts
-                              const isWinner  = cl.prize?.level === p.level
-                              const isPassed  = shifts >= p.minShifts && !isWinner
-                              const needed    = p.minShifts - shifts
-                              const isClose   = needed > 0 && needed <= 20
-                              const cellStyle = { '--pc': p.color, '--pc-bg': p.bg } as React.CSSProperties
-                              return (
-                                <div key={cl.code}
-                                  className={`pm-status-cell${isWinner ? ' pm-status-winner' : ''}`}
-                                  style={cellStyle}>
-                                  {isWinner ? (
-                                    <>
-                                      <div className="pm-winner-badge">{p.icon} Premio actual</div>
-                                      <div className="pm-winner-budget">{fmtEur(p.budget)}</div>
-                                    </>
-                                  ) : isPassed ? (
-                                    <div className="pm-passed" title="Superado">✓</div>
-                                  ) : isClose ? (
-                                    <>
-                                      <div className="pm-locked">🔒 {needed} más</div>
-                                      <div className="pm-locked-shifts">para alcanzar</div>
-                                    </>
-                                  ) : (
-                                    <div className="pm-none">—</div>
-                                  )}
+                        {ANNUAL_PRIZES.map((p, i) => {
+                          const nextMin = ANNUAL_PRIZES[i + 1]?.minShifts
+                          const rangeLabel = nextMin ? `${p.minShifts}–${nextMin - 1} turnos` : `≥ ${p.minShifts} turnos`
+                          return (
+                            <div key={p.level} className="pm-row">
+                              {/* Level info cell */}
+                              <div className="pm-level-cell" style={{ '--pc': p.color, '--pc-bg': p.bg } as React.CSSProperties}>
+                                <div className="pm-level-name">{p.icon} {p.level}</div>
+                                <div className="pm-level-req">{rangeLabel}</div>
+                                <div className="pm-level-stats">
+                                  <span className="pm-stat-chip">Rev. {fmtEur(p.revenue)}</span>
+                                  <span className="pm-stat-chip">Premio {fmtEur(p.budget)}</span>
+                                  <span className="pm-stat-chip">{p.pct}%</span>
                                 </div>
-                              )
-                            })}
-                          </div>
-                        ))}
+                              </div>
+
+                              {/* Bracket leader per category */}
+                              {clusterBracketData.map(cl => {
+                                const bracket = cl.brackets[i]
+                                const leader  = bracket.leader
+                                const count   = bracket.pros.length
+                                const cellStyle = { '--pc': p.color, '--pc-bg': p.bg } as React.CSSProperties
+                                const isTopBracket = i === ANNUAL_PRIZES.length - 1
+                                return (
+                                  <div key={cl.code}
+                                    className={`pm-status-cell${leader && isTopBracket ? ' pm-status-winner' : ''}`}
+                                    style={cellStyle}>
+                                    {leader ? (
+                                      <>
+                                        {isTopBracket && <div className="pm-winner-badge">{p.icon} Líder</div>}
+                                        <div className="pm-bracket-leader">{leader.first_name} {leader.last_name}</div>
+                                        <div className="pm-bracket-shifts">{fmt(leader.shifts)} turnos</div>
+                                        <div className="pm-bracket-count">{count} clasificado{count !== 1 ? 's' : ''}</div>
+                                      </>
+                                    ) : (
+                                      <div className="pm-bracket-empty">—</div>
+                                    )}
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          )
+                        })}
                       </div>
                       <div className="prize-note">* Revenue y presupuesto calculados como referencia · El nivel final se determina al cierre del período anual</div>
+
+                      {/* ── Clasificados por Nivel ── */}
+                      <div className="prize-classified">
+                        <div className="prize-classified-title">Clasificados por Nivel · {CLUSTERS.find(c => c.code === cluster)?.icon} {CLUSTERS.find(c => c.code === cluster)?.label}</div>
+                        <div className="prize-classified-sub">Todos los profesionales clasificados en cada nivel de premio según sus turnos en el período seleccionado</div>
+                        <div className="prize-class-grid">
+                          {currentClusterBrackets.map((bracket, i) => {
+                            const p = bracket.prize
+                            const nextMin = ANNUAL_PRIZES[i + 1]?.minShifts
+                            const rangeLabel = nextMin ? `${p.minShifts}–${nextMin - 1} turnos` : `≥ ${p.minShifts} turnos`
+                            return (
+                              <div key={p.level} className="prize-class-card" style={{ '--pc': p.color, '--pc-bg': p.bg } as React.CSSProperties}>
+                                <div className="prize-class-card-header">
+                                  <span className="prize-class-card-icon">{p.icon}</span>
+                                  <div>
+                                    <div className="prize-class-card-level">{p.level}</div>
+                                    <div className="prize-class-card-range">{rangeLabel}</div>
+                                  </div>
+                                  <span className="prize-class-card-count">{bracket.pros.length}</span>
+                                </div>
+                                {bracket.pros.length === 0 ? (
+                                  <div className="prize-class-empty">Sin clasificados</div>
+                                ) : (
+                                  bracket.pros.slice(0, 20).map((pro, idx) => (
+                                    <div key={pro.professional_id} className="prize-class-pro-row">
+                                      <span className="prize-class-pos">{idx + 1}</span>
+                                      <span className="prize-class-name">{pro.first_name} {pro.last_name}</span>
+                                      <span className="prize-class-shifts">{fmt(pro.shifts)}t</span>
+                                    </div>
+                                  ))
+                                )}
+                                {bracket.pros.length > 20 && (
+                                  <div className="prize-class-empty">+{bracket.pros.length - 20} más</div>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
                     </div>
                   )
                 })()}
@@ -1194,7 +1253,7 @@ export default function LoyaltyPage() {
                   <div className="lb-header">
                     <span>#</span><span>Profesional</span>
                     <span>Turnos</span><span>Livo Points</span>
-                    <span>Ingresos</span><span>Tier</span>
+                    <span>Ingresos</span><span>Premio</span><span>Tier</span>
                   </div>
                   {prosWithLP.slice(0, 100).map((pro, i) => {
                     const tier = getTier(cluster, pro.effectiveLP)
@@ -1231,6 +1290,16 @@ export default function LoyaltyPage() {
                           </div>
                         </span>
                         <span className="earnings-val">{fmtEur(Number(pro.total_earned))}</span>
+                        <span>
+                          {(() => {
+                            const prize = getAnnualPrize(Number(pro.shifts_completed))
+                            return prize ? (
+                              <span className="tier-pill" style={{ '--tc': prize.color, '--tb': prize.bg } as React.CSSProperties}>
+                                {prize.icon} {prize.level}
+                              </span>
+                            ) : <span style={{ color: '#c8d8de', fontSize: 13 }}>—</span>
+                          })()}
+                        </span>
                         <span>
                           <span className="tier-pill" style={{ '--tc': tier.color, '--tb': tier.bg } as React.CSSProperties}>
                             {tier.icon} {tier.name}
