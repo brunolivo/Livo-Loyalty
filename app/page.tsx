@@ -245,6 +245,80 @@ const css = `
   .facility-tag.exclusive { background:#eef0fd; border-color:#b0b8f0; color:#3a4ab0; }
   .cat-shift-note { background:#F2F7F9; border-radius:10px; padding:12px 16px; margin-bottom:20px; font-size:12px; color:#5a7a84; }
 
+  /* ── Marketplace ── */
+  .market-banner {
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    border-radius: 16px; padding: 26px 32px; margin-bottom: 24px;
+    display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center;
+    box-shadow: 0 4px 24px rgba(91,111,232,0.2);
+  }
+  .market-banner-tag { font-size:10px; font-weight:700; color:#a5b4fc; text-transform:uppercase; letter-spacing:1.2px; margin-bottom:6px; }
+  .market-banner-title { font-size:22px; font-weight:700; color:#fff; margin-bottom:6px; }
+  .market-banner-sub { font-size:12px; color:rgba(255,255,255,0.55); line-height:1.6; max-width:480px; }
+  .market-rate-grid { display:flex; flex-direction:column; gap:6px; flex-shrink:0; }
+  .market-rate-row { display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.07); border-radius:10px; padding:8px 14px; white-space:nowrap; }
+  .market-rate-lp { font-size:14px; font-weight:700; color:#a5b4fc; min-width:64px; }
+  .market-rate-sep { font-size:11px; color:rgba(255,255,255,0.3); }
+  .market-rate-val { font-size:12px; color:rgba(255,255,255,0.75); }
+
+  .market-cats { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
+  .market-cat-btn {
+    display:flex; align-items:center; gap:6px;
+    padding:8px 16px; border-radius:20px; cursor:pointer;
+    font-size:12px; font-weight:500; color:#5a7a84;
+    border:1.5px solid #dde8ec; background:#fff; font-family:inherit; transition:all 0.15s;
+  }
+  .market-cat-btn:hover { border-color:#86D2AC; color:#104455; }
+  .market-cat-btn.active { color:#fff; border-color:transparent; font-weight:600; }
+  .market-cat-count { font-size:10px; opacity:0.7; margin-left:2px; }
+
+  .market-featured-section { margin-bottom:28px; }
+  .market-featured-label { font-size:11px; font-weight:700; color:#5a7a84; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+  .market-featured-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+
+  .market-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+
+  .market-card {
+    background:#fff; border-radius:16px; padding:18px;
+    box-shadow:0 2px 12px rgba(16,68,85,0.06);
+    border-top:3px solid var(--mc); display:flex; flex-direction:column;
+    transition:box-shadow 0.15s, transform 0.15s; position:relative;
+  }
+  .market-card:hover { box-shadow:0 6px 24px rgba(16,68,85,0.12); transform:translateY(-2px); }
+  .market-card.featured { border-top-width:4px; box-shadow:0 4px 20px rgba(91,111,232,0.12); }
+  .market-card-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:10px; }
+  .market-card-icon { font-size:26px; line-height:1; }
+  .market-card-tag {
+    font-size:9px; font-weight:700; padding:3px 8px; border-radius:8px;
+    background:var(--mc-bg); color:var(--mc); letter-spacing:0.3px; white-space:nowrap;
+  }
+  .market-card-name { font-size:13px; font-weight:700; color:#104455; margin-bottom:5px; line-height:1.3; }
+  .market-card-desc { font-size:11px; color:#5a7a84; line-height:1.5; flex:1; margin-bottom:12px; }
+  .market-card-partner { display:inline-flex; align-items:center; gap:4px; font-size:10px; color:#9db5bc; font-weight:500; margin-bottom:14px; }
+  .market-card-footer { margin-top:auto; }
+  .market-card-lp-row { display:flex; align-items:baseline; gap:6px; margin-bottom:4px; }
+  .market-card-lp { font-size:22px; font-weight:700; color:#5B6FE8; line-height:1; }
+  .market-card-lp-label { font-size:11px; font-weight:600; color:#5B6FE8; opacity:0.7; }
+  .market-card-shifts { font-size:10px; color:#9db5bc; margin-bottom:12px; }
+  .market-cta {
+    width:100%; padding:9px; border-radius:10px; cursor:pointer;
+    font-size:12px; font-weight:600; color:#fff; text-align:center;
+    border:none; background:var(--mc); font-family:inherit;
+    transition:opacity 0.15s; display:block;
+  }
+  .market-cta:hover { opacity:0.85; }
+  .market-cta.redeemed { background:#edf8f3; color:#2a8a5e; cursor:default; }
+
+  .market-coming-toast {
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:#104455; color:#fff; border-radius:12px; padding:12px 24px;
+    font-size:13px; font-weight:500; box-shadow:0 4px 20px rgba(16,68,85,0.3);
+    z-index:1000; pointer-events:none;
+    animation: toastIn 0.25s ease, toastOut 0.3s ease 2.2s forwards;
+  }
+  @keyframes toastIn  { from { opacity:0; transform:translateX(-50%) translateY(12px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+  @keyframes toastOut { from { opacity:1; } to { opacity:0; } }
+
   /* ── Period filter ── */
   .period-bar {
     display: flex; align-items: center; gap: 8px; margin-bottom: 20px;
@@ -450,6 +524,66 @@ const CLUSTERS = [
   { code: 'DOC',  label: 'Doctores',   icon: '👨‍⚕️' },
 ]
 
+// ─── Marketplace ───────────────────────────────────────────────────────────────
+type MarketItem = {
+  id: string; category: string; icon: string; name: string
+  desc: string; lpCost: number; partner: string
+  featured?: boolean; tag?: string
+}
+
+const MARKET_CATS = [
+  { key: 'all',       label: 'Todo',          icon: '🛒', color: '#104455' },
+  { key: 'formation', label: 'Formación',      icon: '🎓', color: '#5B6FE8' },
+  { key: 'travel',    label: 'Viajes',         icon: '✈️', color: '#357382' },
+  { key: 'dining',    label: 'Restaurantes',   icon: '🍽️', color: '#e85d04' },
+  { key: 'wellness',  label: 'Wellness',       icon: '🧘', color: '#2a8a5e' },
+  { key: 'tech',      label: 'Tech',           icon: '📱', color: '#7c3aed' },
+  { key: 'clinical',  label: 'Equipamiento',   icon: '🩺', color: '#0891b2' },
+  { key: 'giftcard',  label: 'Gift Cards',     icon: '💳', color: '#D4A017' },
+]
+
+const MARKET_ITEMS: MarketItem[] = [
+  // Formación
+  { id: 'f1', category: 'formation', icon: '📱', name: 'Plataforma e-learning 1 mes',     desc: '+200 cursos acreditados para sanitarios con certificado oficial',           lpCost: 100,  partner: 'Aula Salud',    tag: 'Más popular' },
+  { id: 'f2', category: 'formation', icon: '🎓', name: 'Curso ACLS/BLS online',            desc: 'Certificación en soporte vital avanzado y básico reconocida por la AHA',    lpCost: 400,  partner: 'AHA Spain' },
+  { id: 'f3', category: 'formation', icon: '🏥', name: 'Postgrado UCI Adulto — €300 dto',  desc: 'Descuento directo sobre la matrícula del postgrado de cuidados intensivos',  lpCost: 1500, partner: 'Univ. Barcelona', featured: true },
+  { id: 'f4', category: 'formation', icon: '🔬', name: 'Máster Enf. Quirúrgica — €600 dto',desc: 'Descuento aplicado en el máster oficial de enfermería de quirófano',          lpCost: 4000, partner: 'Blanquerna',   tag: 'Premium' },
+  { id: 'f5', category: 'formation', icon: '📚', name: 'EvidenceNurse Premium 6 meses',    desc: 'Acceso a base de datos de evidencia enfermera, protocolos y guías clínicas', lpCost: 300,  partner: 'EvidenceNurse' },
+
+  // Viajes
+  { id: 'v1', category: 'travel',    icon: '✈️', name: 'Vuelo nacional hasta €80',        desc: 'Voucher para vuelo nacional en aerolíneas partner · sin restricción de fecha', lpCost: 600,  partner: 'Vueling',      tag: 'Más popular' },
+  { id: 'v2', category: 'travel',    icon: '🏨', name: '2 noches hotel ciudad española',  desc: 'Hotel 3★ o superior en Madrid, Barcelona, Valencia o Sevilla',                lpCost: 900,  partner: 'Booking.com' },
+  { id: 'v3', category: 'travel',    icon: '🌍', name: 'Vuelo europeo hasta €150',        desc: 'Voucher para vuelo a cualquier destino europeo en aerolíneas Iberia Group',   lpCost: 1200, partner: 'Iberia',       featured: true },
+  { id: 'v4', category: 'travel',    icon: '🏖️', name: 'Pack spa 2 noches',              desc: 'Escapada a hotel balneario con acceso a spa y desayuno incluido',              lpCost: 1800, partner: 'NH Hotels',    tag: 'Limitado' },
+
+  // Restaurantes
+  { id: 'r1', category: 'dining',    icon: '🍽️', name: 'Voucher restaurante €20',        desc: 'Canjeable en más de 200 restaurantes partner en toda España',                  lpCost: 150,  partner: 'TheFork',      tag: 'Más popular' },
+  { id: 'r2', category: 'dining',    icon: '🥂', name: 'Cena para 2 con copa incluida',  desc: 'Menú completo para dos en restaurantes seleccionados de la red Livo',           lpCost: 400,  partner: 'Lateral' },
+  { id: 'r3', category: 'dining',    icon: '⭐', name: 'Menú degustación premium',       desc: 'Experiencia gastronómica con maridaje de vinos en restaurante premium',         lpCost: 700,  partner: 'Grupo Sagardi' },
+
+  // Wellness
+  { id: 'w1', category: 'wellness',  icon: '🧘', name: 'App meditación Calm 1 año',      desc: 'Suscripción anual premium para mindfulness y gestión del estrés post-turno',   lpCost: 120,  partner: 'Calm',         tag: 'Más popular' },
+  { id: 'w2', category: 'wellness',  icon: '🧖', name: 'Sesión masaje 60 min',           desc: 'Masaje relajante o descontracturante en centros de bienestar partner',          lpCost: 300,  partner: 'Neoforma' },
+  { id: 'w3', category: 'wellness',  icon: '💪', name: '1 mes de gimnasio gratis',       desc: 'Cuota mensual en cualquier centro de la red VivaGym o Anytime Fitness',         lpCost: 350,  partner: 'VivaGym' },
+  { id: 'w4', category: 'wellness',  icon: '🌿', name: 'Retiro bienestar 3 días',        desc: 'Escapada a centro de retiro con yoga, meditación y alimentación saludable',     lpCost: 1800, partner: 'SHA Wellness',  featured: true, tag: 'Limitado' },
+
+  // Tech
+  { id: 't1', category: 'tech',      icon: '🎧', name: 'Auriculares inalámbricos',       desc: 'Auriculares Bluetooth con cancelación de ruido activa · ideal post-turno',      lpCost: 800,  partner: 'Amazon',       tag: 'Nuevo' },
+  { id: 't2', category: 'tech',      icon: '⌚', name: 'Smartwatch de salud',            desc: 'Reloj inteligente con monitorización de sueño, estrés y actividad física',      lpCost: 2000, partner: 'Samsung Health', featured: true },
+  { id: 't3', category: 'tech',      icon: '🖥️', name: 'Voucher tech €150',             desc: 'Vale de compra en MediaMarkt o El Corte Inglés tecnología',                     lpCost: 1500, partner: 'MediaMarkt' },
+
+  // Equipamiento clínico
+  { id: 'c1', category: 'clinical',  icon: '🩺', name: 'Estetoscopio Littmann Classic', desc: 'Littmann Classic III, el estándar de oro en auscultación clínica',              lpCost: 700,  partner: 'Livo Store',   tag: 'Más popular' },
+  { id: 'c2', category: 'clinical',  icon: '👟', name: 'Zuecos ergonómicos premium',    desc: 'Zuecos profesionales con soporte de arco y plantilla antiestática',              lpCost: 350,  partner: 'Clogs & Care' },
+  { id: 'c3', category: 'clinical',  icon: '💊', name: 'Kit diagnóstico completo',      desc: 'Set con otoscopio, oftalmoscopio y tensiómetro digital profesional',             lpCost: 500,  partner: 'Livo Store' },
+
+  // Gift Cards
+  { id: 'g1', category: 'giftcard',  icon: '🛍️', name: 'Amazon Gift Card €20',          desc: 'Tarjeta regalo Amazon válida para cualquier producto',                          lpCost: 200,  partner: 'Amazon',       tag: 'Más popular' },
+  { id: 'g2', category: 'giftcard',  icon: '🛍️', name: 'Amazon Gift Card €50',          desc: 'Tarjeta regalo Amazon válida para cualquier producto',                          lpCost: 500,  partner: 'Amazon' },
+  { id: 'g3', category: 'giftcard',  icon: '🏬', name: 'El Corte Inglés €50',           desc: 'Tarjeta regalo válida en cualquier sección de El Corte Inglés',                 lpCost: 500,  partner: 'El Corte Inglés' },
+  { id: 'g4', category: 'giftcard',  icon: '🏃', name: 'Decathlon €30',                 desc: 'Tarjeta regalo para material deportivo en cualquier tienda Decathlon',           lpCost: 300,  partner: 'Decathlon' },
+]
+
 // LP multipliers applied client-side (server sends raw LP = shifts×10)
 function computeLP(pro: Professional, isConsistent: boolean) {
   let lp = Number(pro.shifts_completed) * 10
@@ -613,8 +747,10 @@ export default function LoyaltyPage() {
   const [loading, setLoading] = useState(true)
   const [refetching, setRefetching] = useState(false)
   const [cluster, setCluster] = useState('ENF')
-  const [view, setView] = useState<'ranking' | 'retos' | 'beneficios' | 'turnos' | 'urgentes'>('ranking')
+  const [view, setView] = useState<'ranking' | 'retos' | 'tienda' | 'beneficios' | 'turnos' | 'urgentes'>('ranking')
   const [period, setPeriod] = useState<Period>('year')
+  const [marketCat, setMarketCat] = useState('all')
+  const [toastItem, setToastItem] = useState<string | null>(null)
   const [customFrom, setCustomFrom] = useState('')
   const today = new Date().toISOString().slice(0, 10)
   const [customTo, setCustomTo] = useState(today)
@@ -640,6 +776,11 @@ export default function LoyaltyPage() {
   const handlePeriod = (p: Period) => {
     setPeriod(p)
     if (p !== 'custom') fetchData(p)
+  }
+
+  const handleRedeem = (itemName: string) => {
+    setToastItem(itemName)
+    setTimeout(() => setToastItem(null), 2500)
   }
 
   const allStats     = data?.stats ?? []
@@ -807,6 +948,7 @@ export default function LoyaltyPage() {
               {[
                 { key: 'ranking',    label: '🏆 Ranking LP' },
                 { key: 'retos',      label: '🎯 Retos del Mes' },
+                { key: 'tienda',     label: '🛒 Tienda LP' },
                 { key: 'urgentes',   label: '🚨 Turnos Urgentes' },
                 { key: 'beneficios', label: '🎁 Beneficios' },
                 { key: 'turnos',     label: '🔑 Turnos Prioritarios' },
@@ -1052,6 +1194,140 @@ export default function LoyaltyPage() {
                 </div>
               </>
             )}
+
+            {/* ══════════ VIEW: TIENDA LP ══════════ */}
+            {view === 'tienda' && (() => {
+              const topLP = prosWithLP[0]?.effectiveLP ?? 0
+              const filtered = marketCat === 'all'
+                ? MARKET_ITEMS
+                : MARKET_ITEMS.filter(i => i.category === marketCat)
+              const featured = MARKET_ITEMS.filter(i => i.featured)
+
+              return (
+                <>
+                  {/* Banner */}
+                  <div className="market-banner">
+                    <div>
+                      <div className="market-banner-tag">🛒 Canjea tus Livo Points</div>
+                      <div className="market-banner-title">Tienda de Recompensas</div>
+                      <div className="market-banner-sub">
+                        Convierte tus LP en formación, viajes, experiencias y equipamiento clínico.
+                        Top del cluster actual: <strong style={{color:'#a5b4fc'}}>{fmt(topLP)} LP</strong>.
+                        Cada turno que cubres suma puntos para canjear aquí.
+                      </div>
+                    </div>
+                    <div className="market-rate-grid">
+                      {[
+                        { lp: '100 LP',  val: 'App wellness 1 año' },
+                        { lp: '350 LP',  val: '1 mes de gimnasio' },
+                        { lp: '700 LP',  val: 'Estetoscopio Littmann' },
+                        { lp: '1.200 LP',val: 'Vuelo europeo hasta €150' },
+                        { lp: '2.000 LP',val: 'Smartwatch de salud' },
+                      ].map(r => (
+                        <div key={r.lp} className="market-rate-row">
+                          <span className="market-rate-lp">{r.lp}</span>
+                          <span className="market-rate-sep">→</span>
+                          <span className="market-rate-val">{r.val}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Category filter */}
+                  <div className="market-cats">
+                    {MARKET_CATS.map(cat => {
+                      const count = cat.key === 'all' ? MARKET_ITEMS.length : MARKET_ITEMS.filter(i => i.category === cat.key).length
+                      return (
+                        <button
+                          key={cat.key}
+                          className={`market-cat-btn${marketCat === cat.key ? ' active' : ''}`}
+                          style={marketCat === cat.key ? { background: cat.color } as React.CSSProperties : {}}
+                          onClick={() => setMarketCat(cat.key)}
+                        >
+                          {cat.icon} {cat.label}
+                          <span className="market-cat-count">({count})</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  {/* Featured — only when showing all */}
+                  {marketCat === 'all' && (
+                    <div className="market-featured-section">
+                      <div className="market-featured-label">⭐ Destacados</div>
+                      <div className="market-featured-grid">
+                        {featured.map(item => {
+                          const cat = MARKET_CATS.find(c => c.key === item.category)!
+                          const shiftsNeeded = Math.ceil(item.lpCost / 10)
+                          return (
+                            <div key={item.id} className="market-card featured"
+                              style={{ '--mc': cat.color, '--mc-bg': cat.color + '18' } as React.CSSProperties}>
+                              <div className="market-card-top">
+                                <span className="market-card-icon">{item.icon}</span>
+                                <span className="market-card-tag">{cat.icon} {cat.label}</span>
+                              </div>
+                              <div className="market-card-name">{item.name}</div>
+                              <div className="market-card-desc">{item.desc}</div>
+                              <div className="market-card-partner">🤝 {item.partner}</div>
+                              <div className="market-card-footer">
+                                <div className="market-card-lp-row">
+                                  <span className="market-card-lp">{fmt(item.lpCost)}</span>
+                                  <span className="market-card-lp-label">LP</span>
+                                </div>
+                                <div className="market-card-shifts">≈ {shiftsNeeded} turnos base</div>
+                                <button className="market-cta" style={{ background: cat.color } as React.CSSProperties}
+                                  onClick={() => handleRedeem(item.name)}>
+                                  Canjear →
+                                </button>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Full catalog */}
+                  <div className="section-title">{marketCat === 'all' ? 'Catálogo completo' : MARKET_CATS.find(c => c.key === marketCat)?.label}</div>
+                  <div className="section-sub">{filtered.length} productos disponibles · ordenados por coste LP ascendente</div>
+                  <div className="market-grid">
+                    {[...filtered].sort((a,b) => a.lpCost - b.lpCost).map(item => {
+                      const cat = MARKET_CATS.find(c => c.key === item.category)!
+                      const shiftsNeeded = Math.ceil(item.lpCost / 10)
+                      const canAfford = topLP >= item.lpCost
+                      return (
+                        <div key={item.id} className="market-card"
+                          style={{ '--mc': cat.color, '--mc-bg': cat.color + '18' } as React.CSSProperties}>
+                          <div className="market-card-top">
+                            <span className="market-card-icon">{item.icon}</span>
+                            {item.tag
+                              ? <span className="market-card-tag">{item.tag}</span>
+                              : <span className="market-card-tag">{cat.icon} {cat.label}</span>}
+                          </div>
+                          <div className="market-card-name">{item.name}</div>
+                          <div className="market-card-desc">{item.desc}</div>
+                          <div className="market-card-partner">🤝 {item.partner}</div>
+                          <div className="market-card-footer">
+                            <div className="market-card-lp-row">
+                              <span className="market-card-lp">{fmt(item.lpCost)}</span>
+                              <span className="market-card-lp-label">LP</span>
+                            </div>
+                            <div className="market-card-shifts">
+                              ≈ {shiftsNeeded} turnos base
+                              {canAfford && <span style={{color:'#2a8a5e', marginLeft:6, fontWeight:600}}>✓ Al alcance del top</span>}
+                            </div>
+                            <button className="market-cta" style={{ background: cat.color } as React.CSSProperties}
+                              onClick={() => handleRedeem(item.name)}>
+                              Canjear →
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </>
+              )
+            })()}
 
             {/* ══════════ VIEW: URGENTES ══════════ */}
             {view === 'urgentes' && (
@@ -1357,6 +1633,12 @@ export default function LoyaltyPage() {
           </>
         )}
       </div>
+
+      {toastItem && (
+        <div className="market-coming-toast">
+          🎉 <strong>{toastItem}</strong> — Canje disponible en Q3 2026. ¡Sigue acumulando LP!
+        </div>
+      )}
     </div>
   )
 }
