@@ -628,9 +628,12 @@ function getAnnualPrize(shifts: number) {
   return null
 }
 
-// DOC budget is the base; ENF and TCAE are divided by 3.5
+// DOC is the base; ENF = DOC ÷ 3.5; TCAE = ENF ÷ 1.5
 function getPrizeBudget(prize: { budget: number }, categoryCode: string) {
-  return categoryCode === 'DOC' ? prize.budget : Math.round(prize.budget / 3.5)
+  if (categoryCode === 'DOC') return prize.budget
+  const enfBudget = Math.round(prize.budget / 3.5)
+  if (categoryCode === 'ENF') return enfBudget
+  return Math.round(enfBudget / 1.5) // TCAE
 }
 
 // ─── Marketplace ───────────────────────────────────────────────────────────────
@@ -1179,7 +1182,8 @@ export default function LoyaltyPage() {
                                 <div className="pm-level-req">{rangeLabel}</div>
                                 <div className="pm-level-stats">
                                   <span className="pm-stat-chip">Rev. {fmtEur(p.revenue)}</span>
-                                  <span className="pm-stat-chip">ENF/TCAE {fmtEur(getPrizeBudget(p, 'ENF'))}</span>
+                                  <span className="pm-stat-chip">ENF {fmtEur(getPrizeBudget(p, 'ENF'))}</span>
+                                  <span className="pm-stat-chip">TCAE {fmtEur(getPrizeBudget(p, 'TCAE'))}</span>
                                   <span className="pm-stat-chip">DOC {fmtEur(p.budget)}</span>
                                 </div>
                               </div>
