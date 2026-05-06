@@ -43,7 +43,7 @@ WHERE psc.status = 'APPROVED'
   AND ${dc}
 GROUP BY pp.category_code, psc.professional_id, u.first_name, u.last_name
 ORDER BY pp.category_code, shifts_completed DESC
-LIMIT 500
+LIMIT 5000
 `
 
 const statsSQL = (dc: string) => `
