@@ -22,7 +22,9 @@ function dateCond(period: string, from: string | null, to: string | null): strin
 }
 
 // ─── SQL builders (period-sensitive) ──────────────────────────────────────────
-const leaderboardSQL = (dc: string) => `
+// One query per cluster so each stays well under Metabase's 2000-row server cap.
+// Combined via Promise.all — no cross-cluster row competition.
+const leaderboardSQL = (dc: string, cat: string) => `
 SELECT
   pp.category_code,
   psc.professional_id,
@@ -39,11 +41,11 @@ FROM professional_shift_claim psc
 JOIN professional_profile pp ON pp.professional_id = psc.professional_id
 JOIN user u ON u.id = psc.professional_id
 WHERE psc.status = 'APPROVED'
-  AND pp.category_code IN ('ENF', 'TCAE', 'DOC')
+  AND pp.category_code = '${cat}'
   AND ${dc}
 GROUP BY pp.category_code, psc.professional_id, u.first_name, u.last_name
-ORDER BY pp.category_code, shifts_completed DESC
-LIMIT 5000
+ORDER BY shifts_completed DESC
+LIMIT 2000
 `
 
 const statsSQL = (dc: string) => `
@@ -172,8 +174,10 @@ export async function GET(req: NextRequest) {
   const dc = dateCond(period, from, to)
 
   try {
-    const [leaderboard, stats, challenges, consistent, monthlyPros, urgentStats, urgent] = await Promise.all([
-      executeQuery(leaderboardSQL(dc)),
+    const [lbEnf, lbTcae, lbDoc, stats, challenges, consistent, monthlyPros, urgentStats, urgent] = await Promise.all([
+      executeQuery(leaderboardSQL(dc, 'ENF')),
+      executeQuery(leaderboardSQL(dc, 'TCAE')),
+      executeQuery(leaderboardSQL(dc, 'DOC')),
       executeQuery(statsSQL(dc)),
       safe(executeQuery(CHALLENGES_SQL), []),
       safe(executeQuery(CONSISTENT_SQL), []),
@@ -181,6 +185,7 @@ export async function GET(req: NextRequest) {
       safe(executeQuery(urgentStatsSQL(dc)), []),
       safe(executeQuery(urgentSQL(dc)), []),
     ])
+    const leaderboard = [...lbEnf, ...lbTcae, ...lbDoc]
     return NextResponse.json({
       leaderboard, stats, challenges, consistent, monthlyPros, urgentStats, urgent,
       period, from, to,
