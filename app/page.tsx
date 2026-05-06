@@ -257,42 +257,55 @@ const css = `
   .prize-hero-title { font-size:20px; font-weight:700; color:#fff; margin-bottom:5px; }
   .prize-hero-sub { font-size:12px; color:rgba(255,255,255,0.55); line-height:1.6; max-width:640px; }
 
-  .prize-leaders-strip { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px; }
-  .prize-leader-card {
-    background:#fff; border-radius:16px; padding:20px 22px;
-    box-shadow:0 2px 12px rgba(16,68,85,0.06);
-    border:2px solid transparent; transition:border-color 0.15s;
+  /* ── Prize matrix ── */
+  .prize-matrix {
+    background:#fff; border-radius:16px; overflow:hidden;
+    box-shadow:0 2px 12px rgba(16,68,85,0.06); margin-bottom:14px;
   }
-  .prize-leader-card.active-cluster { border-color:#86D2AC; }
-  .prize-leader-cluster { font-size:12px; font-weight:700; color:#5a7a84; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
-  .prize-leader-name { font-size:18px; font-weight:700; color:#104455; margin-bottom:3px; line-height:1.3; }
-  .prize-leader-shifts { font-size:11px; color:#9db5bc; margin-bottom:12px; }
-  .prize-leader-prize {
-    display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:700;
-    padding:5px 14px; border-radius:20px; background:var(--pc); color:#fff;
+  .pm-row { display:grid; grid-template-columns:210px repeat(3,1fr); }
+  .pm-row + .pm-row { border-top:1px solid #f0f5f7; }
+  .pm-header { background:#F2F7F9; }
+  .pm-corner {
+    padding:16px 20px; display:flex; flex-direction:column; justify-content:flex-end;
+    border-right:1px solid #eaeff2;
   }
-  .prize-leader-no-prize { font-size:11px; color:#9db5bc; font-style:italic; }
+  .pm-corner-label { font-size:10px; font-weight:700; color:#9db5bc; text-transform:uppercase; letter-spacing:0.5px; }
+  .pm-cat-cell {
+    padding:16px 18px; text-align:center; border-right:1px solid #eaeff2;
+  }
+  .pm-cat-cell:last-child { border-right:none; }
+  .pm-cat-cluster { font-size:12px; font-weight:700; color:#5a7a84; margin-bottom:6px; display:flex; align-items:center; justify-content:center; gap:5px; }
+  .pm-cat-name { font-size:14px; font-weight:700; color:#104455; margin-bottom:2px; line-height:1.3; }
+  .pm-cat-shifts { font-size:11px; color:#9db5bc; }
 
-  .prize-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:14px; }
-  .prize-card {
-    background:#fff; border-radius:16px; padding:20px;
-    box-shadow:0 2px 12px rgba(16,68,85,0.06);
-    border-top:4px solid var(--pc); position:relative;
+  .pm-level-cell {
+    padding:16px 20px; border-right:1px solid #eaeff2;
+    display:flex; flex-direction:column; justify-content:center;
   }
-  .prize-card.current-leader { box-shadow:0 4px 20px rgba(0,0,0,0.12); transform:translateY(-3px); }
-  .prize-card-level { display:flex; align-items:center; gap:6px; font-size:16px; font-weight:800; color:var(--pc); margin-bottom:3px; }
-  .prize-card-req { font-size:11px; color:#9db5bc; margin-bottom:16px; }
-  .prize-card-rows { display:flex; flex-direction:column; gap:9px; }
-  .prize-card-row { display:flex; justify-content:space-between; align-items:center; padding:7px 10px; border-radius:8px; background:#F2F7F9; }
-  .prize-card-row-label { font-size:10px; font-weight:600; color:#5a7a84; text-transform:uppercase; letter-spacing:0.3px; }
-  .prize-card-row-val { font-size:13px; font-weight:700; color:#104455; }
-  .prize-card-pct { font-size:22px; font-weight:800; color:var(--pc); text-align:center; margin-top:12px; line-height:1; }
-  .prize-card-pct-label { font-size:10px; color:#9db5bc; text-align:center; margin-top:2px; }
-  .prize-card-current-badge {
-    position:absolute; top:-10px; left:50%; transform:translateX(-50%);
-    background:var(--pc); color:#fff; font-size:9px; font-weight:700;
-    padding:3px 10px; border-radius:10px; white-space:nowrap; letter-spacing:0.3px;
+  .pm-level-name { display:flex; align-items:center; gap:6px; font-size:15px; font-weight:800; color:var(--pc); margin-bottom:2px; }
+  .pm-level-req { font-size:10px; color:#9db5bc; margin-bottom:8px; }
+  .pm-level-stats { display:flex; gap:6px; flex-wrap:wrap; }
+  .pm-stat-chip { font-size:10px; font-weight:600; padding:2px 8px; border-radius:6px; background:var(--pc-bg,#F2F7F9); color:var(--pc); }
+
+  .pm-status-cell {
+    padding:14px 16px; border-right:1px solid #f0f5f7;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:4px; text-align:center;
   }
+  .pm-status-cell:last-child { border-right:none; }
+  .pm-status-winner {
+    background:var(--pc-bg); border-left:3px solid var(--pc);
+  }
+  .pm-winner-badge {
+    display:inline-flex; align-items:center; gap:4px;
+    font-size:11px; font-weight:700; padding:4px 12px; border-radius:20px;
+    background:var(--pc); color:#fff; margin-bottom:4px;
+  }
+  .pm-winner-budget { font-size:16px; font-weight:700; color:var(--pc); }
+  .pm-passed { font-size:18px; color:#86D2AC; }
+  .pm-locked { font-size:11px; font-weight:600; color:#D4A017; }
+  .pm-locked-shifts { font-size:10px; color:#9db5bc; margin-top:1px; }
+  .pm-none { font-size:20px; color:#e8eff2; }
   .prize-note { font-size:11px; color:#9db5bc; text-align:center; padding:4px 0; }
 
   /* ── Marketplace ── */
@@ -1101,56 +1114,76 @@ export default function LoyaltyPage() {
                         </div>
                       </div>
 
-                      <div className="prize-leaders-strip">
-                        {clusterLeaders.map(cl => (
-                          <div key={cl.code} className={`prize-leader-card${cl.code === cluster ? ' active-cluster' : ''}`}>
-                            <div className="prize-leader-cluster">{cl.icon} {cl.label}</div>
-                            {cl.pro ? (
-                              <>
-                                <div className="prize-leader-name">{cl.pro.first_name} {cl.pro.last_name}</div>
-                                <div className="prize-leader-shifts">{fmt(cl.shifts)} turnos · #1 actual · {periodShort}</div>
-                                {cl.prize ? (
-                                  <div className="prize-leader-prize" style={{ '--pc': cl.prize.color } as React.CSSProperties}>
-                                    {cl.prize.icon} {cl.prize.level} · {fmtEur(cl.prize.budget)}
-                                  </div>
-                                ) : (
-                                  <div className="prize-leader-no-prize">Mín. 25 turnos para optar</div>
-                                )}
-                              </>
-                            ) : (
-                              <div className="prize-leader-name" style={{ opacity: 0.35 }}>Sin datos</div>
-                            )}
+                      {/* Matrix table */}
+                      <div className="prize-matrix">
+                        {/* Header row — category leaders */}
+                        <div className="pm-row pm-header">
+                          <div className="pm-corner">
+                            <span className="pm-corner-label">Nivel · Requisito</span>
+                          </div>
+                          {clusterLeaders.map(cl => (
+                            <div key={cl.code} className="pm-cat-cell">
+                              <div className="pm-cat-cluster">{cl.icon} {cl.label}</div>
+                              {cl.pro ? (
+                                <>
+                                  <div className="pm-cat-name">{cl.pro.first_name} {cl.pro.last_name}</div>
+                                  <div className="pm-cat-shifts">{fmt(cl.shifts)} turnos · {periodShort}</div>
+                                </>
+                              ) : (
+                                <div className="pm-cat-shifts">Sin datos</div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* One row per prize level */}
+                        {ANNUAL_PRIZES.map(p => (
+                          <div key={p.level} className="pm-row">
+                            {/* Level info cell */}
+                            <div className="pm-level-cell" style={{ '--pc': p.color, '--pc-bg': p.bg } as React.CSSProperties}>
+                              <div className="pm-level-name">{p.icon} {p.level}</div>
+                              <div className="pm-level-req">≥ {p.minShifts} turnos</div>
+                              <div className="pm-level-stats">
+                                <span className="pm-stat-chip">Rev. {fmtEur(p.revenue)}</span>
+                                <span className="pm-stat-chip">Premio {fmtEur(p.budget)}</span>
+                                <span className="pm-stat-chip">{p.pct}%</span>
+                              </div>
+                            </div>
+
+                            {/* Status cell per category */}
+                            {clusterLeaders.map(cl => {
+                              const shifts = cl.shifts
+                              const isWinner  = cl.prize?.level === p.level
+                              const isPassed  = shifts >= p.minShifts && !isWinner
+                              const needed    = p.minShifts - shifts
+                              const isClose   = needed > 0 && needed <= 20
+                              const cellStyle = { '--pc': p.color, '--pc-bg': p.bg } as React.CSSProperties
+                              return (
+                                <div key={cl.code}
+                                  className={`pm-status-cell${isWinner ? ' pm-status-winner' : ''}`}
+                                  style={cellStyle}>
+                                  {isWinner ? (
+                                    <>
+                                      <div className="pm-winner-badge">{p.icon} Premio actual</div>
+                                      <div className="pm-winner-budget">{fmtEur(p.budget)}</div>
+                                    </>
+                                  ) : isPassed ? (
+                                    <div className="pm-passed" title="Superado">✓</div>
+                                  ) : isClose ? (
+                                    <>
+                                      <div className="pm-locked">🔒 {needed} más</div>
+                                      <div className="pm-locked-shifts">para alcanzar</div>
+                                    </>
+                                  ) : (
+                                    <div className="pm-none">—</div>
+                                  )}
+                                </div>
+                              )
+                            })}
                           </div>
                         ))}
                       </div>
-
-                      <div className="prize-grid">
-                        {ANNUAL_PRIZES.map((p) => {
-                          const isHighlighted = leaderPrize?.level === p.level
-                          return (
-                            <div key={p.level}
-                              className={`prize-card${isHighlighted ? ' current-leader' : ''}`}
-                              style={{ '--pc': p.color } as React.CSSProperties}>
-                              {isHighlighted && <div className="prize-card-current-badge">⭐ Líder {cluster}</div>}
-                              <div className="prize-card-level">{p.icon} {p.level}</div>
-                              <div className="prize-card-req">≥ {p.minShifts} turnos completados</div>
-                              <div className="prize-card-rows">
-                                <div className="prize-card-row">
-                                  <span className="prize-card-row-label">Revenue</span>
-                                  <span className="prize-card-row-val">{fmtEur(p.revenue)}</span>
-                                </div>
-                                <div className="prize-card-row">
-                                  <span className="prize-card-row-label">Presupuesto</span>
-                                  <span className="prize-card-row-val" style={{ color: p.color }}>{fmtEur(p.budget)}</span>
-                                </div>
-                              </div>
-                              <div className="prize-card-pct">{p.pct}%</div>
-                              <div className="prize-card-pct-label">del revenue en recompensa</div>
-                            </div>
-                          )
-                        })}
-                      </div>
-                      <div className="prize-note">* El nivel se determina por el nº de turnos del #1 al cierre del período anual · Revenue calculado como referencia a 90 turnos para Platino</div>
+                      <div className="prize-note">* Revenue y presupuesto calculados como referencia · El nivel final se determina al cierre del período anual</div>
                     </div>
                   )
                 })()}
