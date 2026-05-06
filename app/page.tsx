@@ -323,6 +323,10 @@ const css = `
   .prize-class-card-level { font-size:14px; font-weight:800; color:var(--pc); }
   .prize-class-card-range { font-size:10px; color:#9db5bc; margin-top:1px; }
   .prize-class-card-count { margin-left:auto; font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; background:var(--pc-bg); color:var(--pc); }
+  .prize-class-card-totals { display:flex; justify-content:space-between; align-items:center; padding:8px 16px; background:var(--pc-bg); border-bottom:1px solid rgba(0,0,0,0.05); }
+  .prize-class-card-total-item { display:flex; flex-direction:column; gap:1px; }
+  .prize-class-card-total-label { font-size:9px; font-weight:700; color:var(--pc); text-transform:uppercase; letter-spacing:0.4px; opacity:0.7; }
+  .prize-class-card-total-val { font-size:13px; font-weight:700; color:var(--pc); }
   .prize-class-pro-row { display:grid; grid-template-columns:22px 1fr auto; align-items:center; padding:8px 16px; border-bottom:1px solid #f6f9fa; gap:8px; }
   .prize-class-pro-row:last-child { border-bottom:none; }
   .prize-class-pos { font-size:11px; font-weight:700; color:#9db5bc; }
@@ -1224,6 +1228,18 @@ export default function LoyaltyPage() {
                                   </div>
                                   <span className="prize-class-card-count">{bracket.pros.length}</span>
                                 </div>
+                                {bracket.pros.length > 0 && (
+                                  <div className="prize-class-card-totals" style={{ '--pc': p.color, '--pc-bg': p.bg } as React.CSSProperties}>
+                                    <div className="prize-class-card-total-item">
+                                      <span className="prize-class-card-total-label">Premio individual</span>
+                                      <span className="prize-class-card-total-val">{fmtEur(p.budget)}</span>
+                                    </div>
+                                    <div className="prize-class-card-total-item" style={{ textAlign: 'right' }}>
+                                      <span className="prize-class-card-total-label">Total a pagar</span>
+                                      <span className="prize-class-card-total-val">{fmtEur(bracket.pros.length * p.budget)}</span>
+                                    </div>
+                                  </div>
+                                )}
                                 {bracket.pros.length === 0 ? (
                                   <div className="prize-class-empty">Sin clasificados</div>
                                 ) : (
