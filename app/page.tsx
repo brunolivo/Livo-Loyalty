@@ -506,6 +506,65 @@ const css = `
   .urgent-empty-title { font-size:16px; font-weight:700; color:#104455; margin-bottom:6px; }
   .urgent-empty-sub { font-size:13px; color:#5a7a84; }
 
+  /* ── Predictor ── */
+  .predictor-banner {
+    background: linear-gradient(135deg, #0a2540, #103a5e, #1d6278);
+    border-radius: 16px; padding: 26px 32px; margin-bottom: 24px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 4px 24px rgba(16,68,85,0.25);
+  }
+  .predictor-banner::before { content:'📈'; position:absolute; right:28px; top:50%; transform:translateY(-50%); font-size:90px; opacity:0.07; pointer-events:none; }
+  .predictor-banner-tag { font-size:10px; font-weight:700; color:#86D2AC; text-transform:uppercase; letter-spacing:1.2px; margin-bottom:6px; }
+  .predictor-banner-title { font-size:22px; font-weight:700; color:#fff; margin-bottom:6px; }
+  .predictor-banner-sub { font-size:12px; color:rgba(255,255,255,0.55); max-width:620px; line-height:1.6; margin-bottom:20px; }
+  .predictor-kpi-row { display:flex; gap:12px; flex-wrap:wrap; }
+  .pkpi { background:rgba(134,210,172,0.1); border:1px solid rgba(134,210,172,0.2); border-radius:10px; padding:10px 18px; }
+  .pkpi-val { font-size:22px; font-weight:700; color:#86D2AC; line-height:1; }
+  .pkpi-label { font-size:11px; color:rgba(255,255,255,0.5); margin-top:3px; }
+
+  .predictor-controls { display:flex; align-items:center; gap:10px; margin-bottom:22px; flex-wrap:wrap; }
+  .predictor-ctrl-label { font-size:11px; font-weight:700; color:#5a7a84; text-transform:uppercase; letter-spacing:0.5px; }
+  .gap-btn {
+    padding:6px 14px; border-radius:20px; cursor:pointer;
+    font-size:12px; font-weight:500; color:#5a7a84;
+    border:1.5px solid #dde8ec; background:#fff; font-family:inherit; transition:all 0.15s;
+  }
+  .gap-btn:hover { border-color:#86D2AC; color:#104455; }
+  .gap-btn.active { background:#104455; color:#fff; border-color:#104455; font-weight:600; }
+
+  .predictor-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:28px; }
+  .predictor-card { background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 2px 12px rgba(16,68,85,0.06); border-top:3px solid var(--pc); }
+  .predictor-card-header { padding:14px 20px 12px; border-bottom:1px solid #f0f5f7; display:flex; align-items:center; gap:10px; }
+  .predictor-card-level { font-size:15px; font-weight:800; color:var(--pc); }
+  .predictor-card-sub { font-size:11px; color:#9db5bc; margin-top:1px; }
+  .predictor-card-badge { margin-left:auto; display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
+  .predictor-card-count { font-size:13px; font-weight:700; color:var(--pc); }
+  .predictor-card-rev { font-size:10px; color:#9db5bc; }
+
+  .predictor-pro-row {
+    display:grid; grid-template-columns:24px 1fr 60px 80px 90px;
+    align-items:center; padding:9px 20px; border-bottom:1px solid #f6f9fa; gap:10px;
+  }
+  .predictor-pro-row:last-child { border-bottom:none; }
+  .predictor-pos { font-size:11px; font-weight:700; color:#9db5bc; }
+  .predictor-name { font-size:12px; font-weight:600; color:#104455; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .predictor-current { font-size:11px; color:#5a7a84; }
+  .gap-pill {
+    display:inline-flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px;
+    white-space:nowrap;
+  }
+  .gap-pill.urgent  { background:#fff0f0; color:#dc2626; }
+  .gap-pill.close   { background:#fff3e0; color:#d97706; }
+  .gap-pill.medium  { background:#fefce8; color:#ca8a04; }
+  .gap-pill.far     { background:#F2F7F9; color:#5a7a84; }
+  .predictor-uplift { font-size:11px; font-weight:600; color:#2a8a5e; text-align:right; white-space:nowrap; }
+
+  .predictor-empty { background:#fff; border-radius:16px; padding:48px; text-align:center; box-shadow:0 2px 12px rgba(16,68,85,0.06); }
+  .predictor-empty-icon { font-size:48px; margin-bottom:12px; }
+  .predictor-empty-title { font-size:16px; font-weight:700; color:#104455; margin-bottom:6px; }
+  .predictor-empty-sub { font-size:13px; color:#5a7a84; }
+
   /* ── Reto rankings ── */
   .reto-rankings-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
   .reto-rank-card {
@@ -861,7 +920,8 @@ export default function LoyaltyPage() {
   const [loading, setLoading] = useState(true)
   const [refetching, setRefetching] = useState(false)
   const [cluster, setCluster] = useState('ENF')
-  const [view, setView] = useState<'ranking' | 'retos' | 'tienda' | 'beneficios' | 'turnos' | 'urgentes'>('ranking')
+  const [view, setView] = useState<'ranking' | 'retos' | 'tienda' | 'beneficios' | 'turnos' | 'urgentes' | 'predictor'>('ranking')
+  const [gapFilter, setGapFilter] = useState<number>(20)
   const [period, setPeriod] = useState<Period>('year')
   const [marketCat, setMarketCat] = useState('all')
   const [toastItem, setToastItem] = useState<string | null>(null)
@@ -1080,6 +1140,7 @@ export default function LoyaltyPage() {
                 { key: 'retos',      label: '🎯 Retos del Mes' },
                 { key: 'tienda',     label: '🛒 Tienda LP' },
                 { key: 'urgentes',   label: '🚨 Turnos Urgentes' },
+                { key: 'predictor',  label: '📈 Activación' },
                 { key: 'beneficios', label: '🎁 Beneficios' },
                 { key: 'turnos',     label: '🔑 Turnos Prioritarios' },
               ].map((t) => (
@@ -1743,6 +1804,129 @@ export default function LoyaltyPage() {
                 )}
               </>
             )}
+
+            {/* ══════════ VIEW: PREDICTOR ══════════ */}
+            {view === 'predictor' && (() => {
+              // For each pro in the current cluster, find distance to next prize threshold
+              const nearThreshold = clusterPros
+                .map(p => {
+                  const shifts = Number(p.shifts_completed)
+                  const currentPrize = getAnnualPrize(shifts)
+                  const nextPrize = ANNUAL_PRIZES.find(pr => pr.minShifts > shifts) ?? null
+                  if (!nextPrize) return null // Already Platino or no prize path
+                  const gap = nextPrize.minShifts - shifts
+                  const revenueOpp = Math.round(gap * Number(p.avg_per_shift))
+                  return { ...p, shifts, currentPrize, nextPrize, gap, revenueOpp }
+                })
+                .filter((p): p is NonNullable<typeof p> => p !== null && p.gap <= gapFilter)
+                .sort((a, b) => a.gap - b.gap || b.shifts - a.shifts)
+
+              // Group by target prize level
+              const groups = ANNUAL_PRIZES.map(prize => ({
+                prize,
+                pros: nearThreshold.filter(p => p.nextPrize.level === prize.level),
+              })).filter(g => g.pros.length > 0)
+
+              const totalRevOpp = nearThreshold.reduce((s, p) => s + p.revenueOpp, 0)
+              const totalPrizeUnlock = nearThreshold.reduce((s, p) => s + getPrizeBudget(p.nextPrize, cluster), 0)
+
+              return (
+                <>
+                  {/* Banner */}
+                  <div className="predictor-banner">
+                    <div className="predictor-banner-tag">📈 Predictor de Activación · {CLUSTERS.find(c => c.code === cluster)?.icon} {CLUSTERS.find(c => c.code === cluster)?.label}</div>
+                    <div className="predictor-banner-title">¿A quién empujar para subir de nivel?</div>
+                    <div className="predictor-banner-sub">
+                      Profesionales a {gapFilter} turnos o menos del siguiente umbral de premio. Foco de activación para maximizar volumen y clasificaciones.
+                    </div>
+                    <div className="predictor-kpi-row">
+                      <div className="pkpi">
+                        <div className="pkpi-val">{nearThreshold.length}</div>
+                        <div className="pkpi-label">pros en zona de activación</div>
+                      </div>
+                      <div className="pkpi">
+                        <div className="pkpi-val">{fmtEur(totalRevOpp)}</div>
+                        <div className="pkpi-label">revenue potencial si escalan</div>
+                      </div>
+                      <div className="pkpi">
+                        <div className="pkpi-val">{fmtEur(totalPrizeUnlock)}</div>
+                        <div className="pkpi-label">nuevo premio desbloqueado</div>
+                      </div>
+                      <div className="pkpi">
+                        <div className="pkpi-val">{groups.length}</div>
+                        <div className="pkpi-label">niveles con candidatos</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Gap filter */}
+                  <div className="predictor-controls">
+                    <span className="predictor-ctrl-label">Máximo de turnos necesarios</span>
+                    {[5, 10, 20, 30, 50].map(n => (
+                      <button key={n} className={`gap-btn${gapFilter === n ? ' active' : ''}`} onClick={() => setGapFilter(n)}>
+                        ≤ {n} turnos
+                      </button>
+                    ))}
+                  </div>
+
+                  {nearThreshold.length === 0 ? (
+                    <div className="predictor-empty">
+                      <div className="predictor-empty-icon">🎯</div>
+                      <div className="predictor-empty-title">No hay pros en zona de activación</div>
+                      <div className="predictor-empty-sub">Amplía el filtro o revisa el período seleccionado</div>
+                    </div>
+                  ) : (
+                    <div className="predictor-grid">
+                      {groups.map(({ prize, pros }) => {
+                        const totalRev = pros.reduce((s, p) => s + p.revenueOpp, 0)
+                        return (
+                          <div key={prize.level} className="predictor-card" style={{ '--pc': prize.color, '--pc-bg': prize.bg } as React.CSSProperties}>
+                            <div className="predictor-card-header">
+                              <span style={{ fontSize: 22 }}>{prize.icon}</span>
+                              <div>
+                                <div className="predictor-card-level">→ {prize.level}</div>
+                                <div className="predictor-card-sub">
+                                  {prize.minShifts} turnos · Premio {fmtEur(getPrizeBudget(prize, cluster))}
+                                </div>
+                              </div>
+                              <div className="predictor-card-badge">
+                                <span className="predictor-card-count">{pros.length} pros</span>
+                                <span className="predictor-card-rev">{fmtEur(totalRev)} oportunidad</span>
+                              </div>
+                            </div>
+                            {/* Column headers */}
+                            <div className="predictor-pro-row" style={{ background: '#F2F7F9', padding: '7px 20px' }}>
+                              <span style={{ fontSize: 10, fontWeight: 700, color: '#9db5bc' }}>#</span>
+                              <span style={{ fontSize: 10, fontWeight: 700, color: '#9db5bc', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Profesional</span>
+                              <span style={{ fontSize: 10, fontWeight: 700, color: '#9db5bc', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Turnos</span>
+                              <span style={{ fontSize: 10, fontWeight: 700, color: '#9db5bc', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Le faltan</span>
+                              <span style={{ fontSize: 10, fontWeight: 700, color: '#9db5bc', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'right' }}>Rev. extra</span>
+                            </div>
+                            {pros.slice(0, 15).map((pro, idx) => {
+                              const gapClass = pro.gap <= 3 ? 'urgent' : pro.gap <= 7 ? 'close' : pro.gap <= 15 ? 'medium' : 'far'
+                              return (
+                                <div key={pro.professional_id} className="predictor-pro-row">
+                                  <span className="predictor-pos">{idx + 1}</span>
+                                  <span className="predictor-name">{pro.first_name} {pro.last_name}</span>
+                                  <span className="predictor-current">{fmt(pro.shifts)}t</span>
+                                  <span className={`gap-pill ${gapClass}`}>+{pro.gap}</span>
+                                  <span className="predictor-uplift">{fmtEur(pro.revenueOpp)}</span>
+                                </div>
+                              )
+                            })}
+                            {pros.length > 15 && (
+                              <div style={{ padding: '10px 20px', fontSize: 11, color: '#9db5bc', textAlign: 'center' }}>
+                                +{pros.length - 15} profesionales más
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </>
+              )
+            })()}
 
             {/* ══════════ VIEW: BENEFICIOS ══════════ */}
             {view === 'beneficios' && (
