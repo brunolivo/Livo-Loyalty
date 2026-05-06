@@ -242,6 +242,84 @@ const css = `
   .error-box { background:#fff0f0; border:1px solid #ffcccc; border-radius:12px; padding:20px; color:#c0392b; font-size:14px; margin-bottom:24px; }
 
   .consistency-leaderboard { background:#fff; border-radius:14px; box-shadow:0 2px 12px rgba(16,68,85,0.06); overflow:hidden; margin-top:16px; }
+
+  /* ── Urgent shifts ── */
+  .urgent-banner {
+    background: linear-gradient(135deg, #7f1d1d, #b91c1c, #e85d04);
+    border-radius: 16px; padding: 26px 32px; margin-bottom: 24px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 4px 24px rgba(232,93,4,0.25);
+  }
+  .urgent-banner::before { content:'🚨'; position:absolute; right:28px; top:50%; transform:translateY(-50%); font-size:80px; opacity:0.08; pointer-events:none; }
+  .urgent-banner-tag { font-size:10px; font-weight:700; color:#fca5a5; text-transform:uppercase; letter-spacing:1.2px; margin-bottom:6px; }
+  .urgent-banner-title { font-size:22px; font-weight:700; color:#fff; margin-bottom:6px; }
+  .urgent-banner-sub { font-size:12px; color:rgba(255,255,255,0.6); margin-bottom:20px; max-width:560px; line-height:1.5; }
+  .urgent-stats-row { display:flex; gap:12px; flex-wrap:wrap; }
+  .ustat { background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); border-radius:10px; padding:10px 16px; min-width:120px; }
+  .ustat-val { font-size:22px; font-weight:700; color:#fff; line-height:1; }
+  .ustat-label { font-size:11px; color:rgba(255,255,255,0.55); margin-top:3px; }
+
+  .urgent-hero {
+    background:#fff; border-radius:16px; padding:22px 26px; margin-bottom:24px;
+    box-shadow: 0 2px 12px rgba(16,68,85,0.06);
+    border-left: 4px solid #e85d04;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .urgent-hero-crown { font-size:42px; flex-shrink:0; }
+  .urgent-hero-label { font-size:10px; font-weight:700; color:#e85d04; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
+  .urgent-hero-name { font-size:20px; font-weight:700; color:#104455; margin-bottom:6px; }
+  .urgent-hero-stats { display:flex; gap:16px; flex-wrap:wrap; }
+  .urgent-hero-stat { font-size:12px; color:#5a7a84; }
+  .urgent-hero-stat strong { color:#104455; font-weight:700; }
+  .urgent-hero-bonus { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; background:#fff3e0; color:#e85d04; margin-left:auto; flex-shrink:0; }
+
+  .urgent-lb { background:#fff; border-radius:16px; box-shadow:0 2px 12px rgba(16,68,85,0.06); overflow:hidden; }
+  .urgent-lb-header {
+    display:grid; grid-template-columns: 44px 1fr 100px 110px 100px 90px 100px;
+    padding:11px 20px; background:#fff8f5;
+    font-size:10px; font-weight:700; color:#9b4a1a;
+    text-transform:uppercase; letter-spacing:0.6px; border-bottom:1px solid #fde8d8;
+  }
+  .urgent-lb-row {
+    display:grid; grid-template-columns: 44px 1fr 100px 110px 100px 90px 100px;
+    padding:12px 20px; border-bottom:1px solid #fdf5f0;
+    align-items:center; transition:background 0.1s;
+  }
+  .urgent-lb-row:last-child { border-bottom:none; }
+  .urgent-lb-row:hover { background:#fffaf7; }
+  .urgent-val { font-size:13px; font-weight:700; color:#e85d04; }
+  .bonus-rate-pill { display:inline-flex; align-items:center; gap:3px; padding:3px 9px; border-radius:20px; font-size:10px; font-weight:700; background:#fff3e0; color:#e85d04; }
+  .urgent-empty { background:#fff; border-radius:16px; padding:48px; text-align:center; box-shadow:0 2px 12px rgba(16,68,85,0.06); }
+  .urgent-empty-icon { font-size:48px; margin-bottom:12px; }
+  .urgent-empty-title { font-size:16px; font-weight:700; color:#104455; margin-bottom:6px; }
+  .urgent-empty-sub { font-size:13px; color:#5a7a84; }
+
+  /* ── Reto rankings ── */
+  .reto-rankings-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
+  .reto-rank-card {
+    background: #fff; border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(16,68,85,0.06);
+    border-top: 3px solid var(--rc); overflow: hidden;
+  }
+  .reto-rank-header {
+    padding: 14px 18px 10px; border-bottom: 1px solid #f0f5f7;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .reto-rank-title { font-size: 13px; font-weight: 700; color: #104455; }
+  .reto-rank-metric { font-size: 11px; color: #9db5bc; margin-top: 1px; }
+  .reto-rank-row {
+    display: grid; grid-template-columns: 28px 1fr 44px;
+    align-items: center; padding: 9px 18px;
+    border-bottom: 1px solid #f6f9fa; font-size: 12px;
+  }
+  .reto-rank-row:last-child { border-bottom: none; }
+  .reto-rank-pos { font-size: 11px; font-weight: 700; color: #9db5bc; }
+  .reto-rank-name { font-weight: 500; color: #104455; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .reto-rank-val { font-weight: 700; color: var(--rc); text-align: right; }
+  .reto-rank-bar-wrap { grid-column: 1/-1; padding: 0 18px 8px; margin-top: -4px; }
+  .reto-rank-bar { height: 2px; background: #F2F7F9; border-radius: 1px; }
+  .reto-rank-bar-fill { height: 100%; border-radius: 1px; background: var(--rc); opacity: 0.4; }
+  .reto-rank-empty { padding: 20px 18px; font-size: 12px; color: #9db5bc; text-align: center; }
 `
 
 // ─── Data types ────────────────────────────────────────────────────────────────
@@ -264,9 +342,27 @@ type ConsistentPro = {
   first_name: string; last_name: string
   total_shifts: number; weeks_active: number; avg_weekly_shifts: number
 }
+type MonthlyPro = {
+  category_code: string; professional_id: number
+  first_name: string; last_name: string
+  shifts_this_month: number; weekend_shifts_month: number
+  night_shifts_month: number; facilities_this_month: number
+}
+type UrgentPro = {
+  category_code: string; professional_id: number
+  first_name: string; last_name: string
+  urgent_shifts: number; urgent_earnings: number
+  avg_per_urgent: number; avg_notice_hours: number; shifts_with_bonus: number
+}
+type UrgentStats = {
+  category_code: string; total_urgent: number; pros_covering: number
+  avg_pay: number; total_earnings: number; shifts_with_bonus: number
+}
 type LoyaltyData = {
   leaderboard: Professional[]; stats: ClusterStats[]
   challenges: ChallengeStats[]; consistent: ConsistentPro[]
+  monthlyPros: MonthlyPro[]
+  urgentStats: UrgentStats[]; urgent: UrgentPro[]
   fetchedAt: string
 }
 
@@ -430,6 +526,25 @@ const SHIFT_CAT_NOTES: Record<string, string> = {
   DOC:  '<strong>Doctores:</strong> Activo+ incluye urgencias de hospitales privados. Referente+ accede a grupos exclusivos con tarifa negociada.',
 }
 
+// Defines which monthly metric backs each challenge ranking, per cluster
+const CHALLENGE_RANK_DEFS: Record<string, { title: string; icon: string; field: string; metricLabel: string; unit: string; color: string }[]> = {
+  ENF: [
+    { title: 'Maratón de mayo',       icon: '📅', field: 'shifts_this_month',    metricLabel: 'turnos completados en mayo', unit: 'turnos', color: '#5B6FE8' },
+    { title: 'Guardias nocturnas',    icon: '🌙', field: 'night_shifts_month',   metricLabel: 'turnos nocturnos (22h–6h)',   unit: 'noches', color: '#104455' },
+    { title: 'Explorador de centros', icon: '🏥', field: 'facilities_this_month', metricLabel: 'centros distintos este mes', unit: 'centros', color: '#86D2AC' },
+  ],
+  TCAE: [
+    { title: 'Reto del mes',          icon: '📅', field: 'shifts_this_month',    metricLabel: 'turnos completados en mayo', unit: 'turnos', color: '#5B6FE8' },
+    { title: 'Nuevas instalaciones',  icon: '🤝', field: 'facilities_this_month', metricLabel: 'centros distintos este mes', unit: 'centros', color: '#D4A017' },
+    { title: 'Fin de semana',         icon: '📆', field: 'weekend_shifts_month', metricLabel: 'turnos en fin de semana',     unit: 'turnos', color: '#86D2AC' },
+  ],
+  DOC: [
+    { title: 'Turno doble',           icon: '📅', field: 'shifts_this_month',    metricLabel: 'turnos completados en mayo', unit: 'turnos', color: '#5B6FE8' },
+    { title: 'Fin de semana',         icon: '🌙', field: 'weekend_shifts_month', metricLabel: 'turnos en fin de semana',     unit: 'turnos', color: '#D4A017' },
+    { title: 'Explorador',            icon: '🏥', field: 'facilities_this_month', metricLabel: 'centros distintos este mes', unit: 'centros', color: '#357382' },
+  ],
+}
+
 function fmt(n: number) { return new Intl.NumberFormat('es-ES').format(n) }
 function fmtEur(n: number) {
   return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n)
@@ -450,7 +565,7 @@ export default function LoyaltyPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [cluster, setCluster] = useState('ENF')
-  const [view, setView] = useState<'ranking' | 'retos' | 'beneficios' | 'turnos'>('ranking')
+  const [view, setView] = useState<'ranking' | 'retos' | 'beneficios' | 'turnos' | 'urgentes'>('ranking')
 
   useEffect(() => {
     fetch('/api/loyalty')
@@ -467,6 +582,9 @@ export default function LoyaltyPage() {
   const clusterConsistent = allConsistent.filter((p) => p.category_code === cluster)
   const consistentIds = new Set(clusterConsistent.map((p) => p.professional_id))
   const challengeStats = data?.challenges?.find((c) => c.category_code === cluster)
+  const monthlyCluster = (data?.monthlyPros ?? []).filter((p) => p.category_code === cluster)
+  const urgentCluster  = (data?.urgent ?? []).filter((p) => p.category_code === cluster)
+  const urgentStat     = data?.urgentStats?.find((s) => s.category_code === cluster)
 
   const totalPros     = allStats.reduce((a, s) => a + Number(s.active_pros), 0)
   const totalShifts   = allStats.reduce((a, s) => a + Number(s.total_shifts), 0)
@@ -577,6 +695,7 @@ export default function LoyaltyPage() {
               {[
                 { key: 'ranking',    label: '🏆 Ranking LP' },
                 { key: 'retos',      label: '🎯 Retos del Mes' },
+                { key: 'urgentes',   label: '🚨 Turnos Urgentes' },
                 { key: 'beneficios', label: '🎁 Beneficios' },
                 { key: 'turnos',     label: '🔑 Turnos Prioritarios' },
               ].map((t) => (
@@ -753,6 +872,50 @@ export default function LoyaltyPage() {
                   })}
                 </div>
 
+                {/* Challenge rankings */}
+                <div className="section-title">Ranking por Reto</div>
+                <div className="section-sub">Top 10 profesionales del cluster en cada reto este mes.</div>
+                <div className="reto-rankings-grid">
+                  {(CHALLENGE_RANK_DEFS[cluster] ?? []).map((def) => {
+                    const sorted = [...monthlyCluster]
+                      .filter((p) => Number((p as Record<string,unknown>)[def.field]) > 0)
+                      .sort((a, b) => Number((b as Record<string,unknown>)[def.field]) - Number((a as Record<string,unknown>)[def.field]))
+                      .slice(0, 10)
+                    const max = sorted[0] ? Number((sorted[0] as Record<string,unknown>)[def.field]) : 1
+                    return (
+                      <div key={def.field} className="reto-rank-card" style={{ '--rc': def.color } as React.CSSProperties}>
+                        <div className="reto-rank-header">
+                          <span style={{ fontSize: 20 }}>{def.icon}</span>
+                          <div>
+                            <div className="reto-rank-title">{def.title}</div>
+                            <div className="reto-rank-metric">{def.metricLabel}</div>
+                          </div>
+                        </div>
+                        {sorted.length === 0 ? (
+                          <div className="reto-rank-empty">Sin datos este mes</div>
+                        ) : sorted.map((p, i) => {
+                          const val = Number((p as Record<string,unknown>)[def.field])
+                          const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : null
+                          return (
+                            <div key={p.professional_id}>
+                              <div className="reto-rank-row">
+                                <span className="reto-rank-pos">{medal ?? `${i + 1}`}</span>
+                                <span className="reto-rank-name">{p.first_name} {p.last_name}</span>
+                                <span className="reto-rank-val">{val} {def.unit}</span>
+                              </div>
+                              <div className="reto-rank-bar-wrap">
+                                <div className="reto-rank-bar">
+                                  <div className="reto-rank-bar-fill" style={{ width: `${(val / max) * 100}%` }} />
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )
+                  })}
+                </div>
+
                 {/* Milestones */}
                 <div className="milestones-section">
                   <div className="section-title">🏅 Hitos del Programa</div>
@@ -775,6 +938,130 @@ export default function LoyaltyPage() {
                     })}
                   </div>
                 </div>
+              </>
+            )}
+
+            {/* ══════════ VIEW: URGENTES ══════════ */}
+            {view === 'urgentes' && (
+              <>
+                {/* Banner */}
+                <div className="urgent-banner">
+                  <div className="urgent-banner-tag">⚡ Datos reales · últimos 12 meses</div>
+                  <div className="urgent-banner-title">Ranking de Turnos Urgentes</div>
+                  <div className="urgent-banner-sub">
+                    Profesionales que cubren turnos marcados como urgentes en la plataforma.
+                    Estos turnos suelen llevar bono Livo y son críticos para las instalaciones.
+                  </div>
+                  {urgentStat ? (
+                    <div className="urgent-stats-row">
+                      <div className="ustat">
+                        <div className="ustat-val">{fmt(Number(urgentStat.total_urgent))}</div>
+                        <div className="ustat-label">turnos urgentes</div>
+                      </div>
+                      <div className="ustat">
+                        <div className="ustat-val">{fmt(Number(urgentStat.pros_covering))}</div>
+                        <div className="ustat-label">pros respondiendo</div>
+                      </div>
+                      <div className="ustat">
+                        <div className="ustat-val">{fmtEur(Number(urgentStat.avg_pay))}</div>
+                        <div className="ustat-label">pago medio / turno</div>
+                      </div>
+                      <div className="ustat">
+                        <div className="ustat-val">
+                          {urgentStat.total_urgent > 0
+                            ? `${Math.round((Number(urgentStat.shifts_with_bonus) / Number(urgentStat.total_urgent)) * 100)}%`
+                            : '—'}
+                        </div>
+                        <div className="ustat-label">con bono Livo</div>
+                      </div>
+                      <div className="ustat">
+                        <div className="ustat-val">{fmtEur(Number(urgentStat.total_earnings))}</div>
+                        <div className="ustat-label">ingresos totales</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="ustat"><div className="ustat-val">—</div><div className="ustat-label">sin datos este período</div></div>
+                  )}
+                </div>
+
+                {urgentCluster.length === 0 ? (
+                  <div className="urgent-empty">
+                    <div className="urgent-empty-icon">🏥</div>
+                    <div className="urgent-empty-title">Sin turnos urgentes registrados</div>
+                    <div className="urgent-empty-sub">Este cluster no tiene turnos marcados como urgentes en los últimos 12 meses.</div>
+                  </div>
+                ) : (
+                  <>
+                    {/* Hero — top responder */}
+                    {urgentCluster[0] && (() => {
+                      const hero = urgentCluster[0]
+                      const bonusPct = hero.urgent_shifts > 0
+                        ? Math.round((Number(hero.shifts_with_bonus) / Number(hero.urgent_shifts)) * 100)
+                        : 0
+                      const tier = getTier(cluster, Number(hero.urgent_shifts) * 10)
+                      return (
+                        <div className="urgent-hero">
+                          <div className="urgent-hero-crown">🥇</div>
+                          <div style={{ flex: 1 }}>
+                            <div className="urgent-hero-label">First Responder del cluster</div>
+                            <div className="urgent-hero-name">{hero.first_name} {hero.last_name}</div>
+                            <div className="urgent-hero-stats">
+                              <span className="urgent-hero-stat"><strong>{fmt(Number(hero.urgent_shifts))}</strong> turnos urgentes</span>
+                              <span className="urgent-hero-stat"><strong>{fmtEur(Number(hero.urgent_earnings))}</strong> ganados</span>
+                              <span className="urgent-hero-stat"><strong>{fmtEur(Number(hero.avg_per_urgent))}</strong> / turno</span>
+                              <span className="tier-pill" style={{ '--tc': tier.color, '--tb': tier.bg } as React.CSSProperties}>{tier.icon} {tier.name}</span>
+                            </div>
+                          </div>
+                          <div className="urgent-hero-bonus">🎁 {bonusPct}% con bono Livo</div>
+                        </div>
+                      )
+                    })()}
+
+                    {/* Leaderboard */}
+                    <div className="section-title">Ranking completo — Turnos Urgentes</div>
+                    <div className="section-sub">Ordenado por número de turnos urgentes cubiertos en los últimos 12 meses.</div>
+                    <div className="urgent-lb">
+                      <div className="urgent-lb-header">
+                        <span>#</span>
+                        <span>Profesional</span>
+                        <span>Urgentes</span>
+                        <span>Ingresos</span>
+                        <span>Avg / turno</span>
+                        <span>% Bono</span>
+                        <span>Tier</span>
+                      </div>
+                      {urgentCluster.map((pro, i) => {
+                        const bonusPct = pro.urgent_shifts > 0
+                          ? Math.round((Number(pro.shifts_with_bonus) / Number(pro.urgent_shifts)) * 100)
+                          : 0
+                        const tier = getTier(cluster, Number(pro.urgent_shifts) * 10)
+                        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : null
+                        return (
+                          <div key={pro.professional_id} className="urgent-lb-row">
+                            <span className="rank">{medal ?? `${i + 1}`}</span>
+                            <span className="pro-name">
+                              {pro.first_name} {pro.last_name}
+                              {consistentIds.has(pro.professional_id) && (
+                                <span className="consistent-badge">⚡ Consistente</span>
+                              )}
+                            </span>
+                            <span className="urgent-val">{fmt(Number(pro.urgent_shifts))}</span>
+                            <span className="earnings-val">{fmtEur(Number(pro.urgent_earnings))}</span>
+                            <span className="shifts-val">{fmtEur(Number(pro.avg_per_urgent))}</span>
+                            <span>
+                              <span className="bonus-rate-pill">🎁 {bonusPct}%</span>
+                            </span>
+                            <span>
+                              <span className="tier-pill" style={{ '--tc': tier.color, '--tb': tier.bg } as React.CSSProperties}>
+                                {tier.icon} {tier.name}
+                              </span>
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </>
+                )}
               </>
             )}
 
