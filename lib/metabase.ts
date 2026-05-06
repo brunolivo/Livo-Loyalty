@@ -28,6 +28,7 @@ export async function executeQuery(sql: string): Promise<Record<string, unknown>
       database: DATABASE_ID,
       type: 'native',
       native: { query: sql },
+      constraints: { 'max-results': 10000 },
     }),
     next: { revalidate: 3600 },
   })
