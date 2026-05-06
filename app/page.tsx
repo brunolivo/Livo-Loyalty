@@ -628,6 +628,11 @@ function getAnnualPrize(shifts: number) {
   return null
 }
 
+// DOC budget is the base; ENF and TCAE are divided by 3.5
+function getPrizeBudget(prize: { budget: number }, categoryCode: string) {
+  return categoryCode === 'DOC' ? prize.budget : Math.round(prize.budget / 3.5)
+}
+
 // ─── Marketplace ───────────────────────────────────────────────────────────────
 type MarketItem = {
   id: string; category: string; icon: string; name: string
@@ -1174,8 +1179,8 @@ export default function LoyaltyPage() {
                                 <div className="pm-level-req">{rangeLabel}</div>
                                 <div className="pm-level-stats">
                                   <span className="pm-stat-chip">Rev. {fmtEur(p.revenue)}</span>
-                                  <span className="pm-stat-chip">Premio {fmtEur(p.budget)}</span>
-                                  <span className="pm-stat-chip">{p.pct}%</span>
+                                  <span className="pm-stat-chip">ENF/TCAE {fmtEur(getPrizeBudget(p, 'ENF'))}</span>
+                                  <span className="pm-stat-chip">DOC {fmtEur(p.budget)}</span>
                                 </div>
                               </div>
 
@@ -1232,11 +1237,11 @@ export default function LoyaltyPage() {
                                   <div className="prize-class-card-totals" style={{ '--pc': p.color, '--pc-bg': p.bg } as React.CSSProperties}>
                                     <div className="prize-class-card-total-item">
                                       <span className="prize-class-card-total-label">Premio individual</span>
-                                      <span className="prize-class-card-total-val">{fmtEur(p.budget)}</span>
+                                      <span className="prize-class-card-total-val">{fmtEur(getPrizeBudget(p, cluster))}</span>
                                     </div>
                                     <div className="prize-class-card-total-item" style={{ textAlign: 'right' }}>
                                       <span className="prize-class-card-total-label">Total a pagar</span>
-                                      <span className="prize-class-card-total-val">{fmtEur(bracket.pros.length * p.budget)}</span>
+                                      <span className="prize-class-card-total-val">{fmtEur(bracket.pros.length * getPrizeBudget(p, cluster))}</span>
                                     </div>
                                   </div>
                                 )}
