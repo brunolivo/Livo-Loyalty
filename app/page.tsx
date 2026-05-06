@@ -249,25 +249,29 @@ const css = `
   .prize-section { margin-bottom: 28px; }
   .prize-hero {
     background: linear-gradient(135deg, #1a1205, #3b2a06, #6b4c0a);
-    border-radius: 16px; padding: 24px 28px; margin-bottom: 20px;
-    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    border-radius: 16px; padding: 24px 28px; margin-bottom: 16px;
     box-shadow: 0 4px 24px rgba(202,138,4,0.2); position: relative; overflow: hidden;
   }
-  .prize-hero::before { content:'🏆'; position:absolute; right:24px; top:50%; transform:translateY(-50%); font-size:90px; opacity:0.06; pointer-events:none; }
+  .prize-hero::before { content:'🏆'; position:absolute; right:28px; top:50%; transform:translateY(-50%); font-size:90px; opacity:0.06; pointer-events:none; }
   .prize-hero-tag { font-size:10px; font-weight:700; color:#fbbf24; text-transform:uppercase; letter-spacing:1.2px; margin-bottom:6px; }
   .prize-hero-title { font-size:20px; font-weight:700; color:#fff; margin-bottom:5px; }
-  .prize-hero-sub { font-size:12px; color:rgba(255,255,255,0.55); line-height:1.6; max-width:480px; }
-  .prize-hero-leader {
-    flex-shrink:0; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12);
-    border-radius:14px; padding:14px 20px; text-align:center; min-width:200px;
+  .prize-hero-sub { font-size:12px; color:rgba(255,255,255,0.55); line-height:1.6; max-width:640px; }
+
+  .prize-leaders-strip { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px; }
+  .prize-leader-card {
+    background:#fff; border-radius:16px; padding:20px 22px;
+    box-shadow:0 2px 12px rgba(16,68,85,0.06);
+    border:2px solid transparent; transition:border-color 0.15s;
   }
-  .prize-hero-leader-label { font-size:10px; color:#fbbf24; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px; }
-  .prize-hero-leader-name { font-size:15px; font-weight:700; color:#fff; margin-bottom:4px; }
-  .prize-hero-leader-shifts { font-size:11px; color:rgba(255,255,255,0.5); margin-bottom:10px; }
-  .prize-hero-leader-prize {
-    display:inline-flex; align-items:center; gap:5px; font-size:13px; font-weight:700;
+  .prize-leader-card.active-cluster { border-color:#86D2AC; }
+  .prize-leader-cluster { font-size:12px; font-weight:700; color:#5a7a84; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+  .prize-leader-name { font-size:18px; font-weight:700; color:#104455; margin-bottom:3px; line-height:1.3; }
+  .prize-leader-shifts { font-size:11px; color:#9db5bc; margin-bottom:12px; }
+  .prize-leader-prize {
+    display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:700;
     padding:5px 14px; border-radius:20px; background:var(--pc); color:#fff;
   }
+  .prize-leader-no-prize { font-size:11px; color:#9db5bc; font-style:italic; }
 
   .prize-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:14px; }
   .prize-card {
@@ -1072,45 +1076,62 @@ export default function LoyaltyPage() {
               <>
                 {/* ── Annual Prize ── */}
                 {(() => {
-                  const leader = prosWithLP[0]
-                  const leaderShifts = leader ? Number(leader.shifts_completed) : 0
-                  const leaderPrize = leader ? getAnnualPrize(leaderShifts) : null
+                  const allLb = data?.leaderboard ?? []
+                  const allConsistentSet = new Set((data?.consistent ?? []).map(p => p.professional_id))
+
+                  const clusterLeaders = CLUSTERS.map(c => {
+                    const top = allLb
+                      .filter(p => p.category_code === c.code)
+                      .map(p => ({ ...p, effectiveLP: computeLP(p, allConsistentSet.has(p.professional_id)) }))
+                      .sort((a, b) => b.effectiveLP - a.effectiveLP)[0] ?? null
+                    const shifts = top ? Number(top.shifts_completed) : 0
+                    return { ...c, pro: top, shifts, prize: getAnnualPrize(shifts) }
+                  })
+
+                  // prize highlighted on the tier cards = current cluster's leader
+                  const leaderPrize = clusterLeaders.find(c => c.code === cluster)?.prize ?? null
+
                   return (
                     <div className="prize-section">
                       <div className="prize-hero">
-                        <div>
-                          <div className="prize-hero-tag">🏆 Premio Anual · Clasificación Final</div>
-                          <div className="prize-hero-title">Top #1 del Año — Recompensa por Actividad</div>
-                          <div className="prize-hero-sub">
-                            El profesional con más turnos completados al cierre del período anual recibe un presupuesto de recompensa basado en el revenue generado. Cuantos más turnos, mayor el nivel y el premio.
-                          </div>
+                        <div className="prize-hero-tag">🏆 Premio Anual · Clasificación Final</div>
+                        <div className="prize-hero-title">Top #1 del Año — Recompensa por Actividad</div>
+                        <div className="prize-hero-sub">
+                          El profesional #1 de cada categoría al cierre del período anual recibe un presupuesto de recompensa proporcional al revenue generado. Cuantos más turnos, mayor el nivel y el premio.
                         </div>
-                        {leader && (
-                          <div className="prize-hero-leader">
-                            <div className="prize-hero-leader-label">Líder actual · {cluster}</div>
-                            <div className="prize-hero-leader-name">{leader.first_name} {leader.last_name}</div>
-                            <div className="prize-hero-leader-shifts">{fmt(leaderShifts)} turnos · {periodShort}</div>
-                            {leaderPrize ? (
-                              <div className="prize-hero-leader-prize" style={{ '--pc': leaderPrize.color } as React.CSSProperties}>
-                                {leaderPrize.icon} {leaderPrize.level} — {fmtEur(leaderPrize.budget)}
-                              </div>
+                      </div>
+
+                      <div className="prize-leaders-strip">
+                        {clusterLeaders.map(cl => (
+                          <div key={cl.code} className={`prize-leader-card${cl.code === cluster ? ' active-cluster' : ''}`}>
+                            <div className="prize-leader-cluster">{cl.icon} {cl.label}</div>
+                            {cl.pro ? (
+                              <>
+                                <div className="prize-leader-name">{cl.pro.first_name} {cl.pro.last_name}</div>
+                                <div className="prize-leader-shifts">{fmt(cl.shifts)} turnos · #1 actual · {periodShort}</div>
+                                {cl.prize ? (
+                                  <div className="prize-leader-prize" style={{ '--pc': cl.prize.color } as React.CSSProperties}>
+                                    {cl.prize.icon} {cl.prize.level} · {fmtEur(cl.prize.budget)}
+                                  </div>
+                                ) : (
+                                  <div className="prize-leader-no-prize">Mín. 25 turnos para optar</div>
+                                )}
+                              </>
                             ) : (
-                              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Aún sin nivel (mín. 25 turnos)</div>
+                              <div className="prize-leader-name" style={{ opacity: 0.35 }}>Sin datos</div>
                             )}
                           </div>
-                        )}
+                        ))}
                       </div>
 
                       <div className="prize-grid">
                         {ANNUAL_PRIZES.map((p) => {
-                          const isCurrentLeader = leaderPrize?.level === p.level
-                          const nextPrize = ANNUAL_PRIZES.find(x => x.minShifts > leaderShifts)
-                          const isNext = !leaderPrize && nextPrize?.level === p.level || (leaderPrize && nextPrize?.level === p.level)
+                          const isHighlighted = leaderPrize?.level === p.level
                           return (
                             <div key={p.level}
-                              className={`prize-card${isCurrentLeader ? ' current-leader' : ''}`}
+                              className={`prize-card${isHighlighted ? ' current-leader' : ''}`}
                               style={{ '--pc': p.color } as React.CSSProperties}>
-                              {isCurrentLeader && <div className="prize-card-current-badge">⭐ Líder actual</div>}
+                              {isHighlighted && <div className="prize-card-current-badge">⭐ Líder {cluster}</div>}
                               <div className="prize-card-level">{p.icon} {p.level}</div>
                               <div className="prize-card-req">≥ {p.minShifts} turnos completados</div>
                               <div className="prize-card-rows">
@@ -1129,7 +1150,7 @@ export default function LoyaltyPage() {
                           )
                         })}
                       </div>
-                      <div className="prize-note">* El nivel se determina por el nº de turnos completados por el #1 al cierre del período anual · Revenue calculado como referencia a 90 turnos para Platino</div>
+                      <div className="prize-note">* El nivel se determina por el nº de turnos del #1 al cierre del período anual · Revenue calculado como referencia a 90 turnos para Platino</div>
                     </div>
                   )
                 })()}
