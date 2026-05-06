@@ -1,6 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+type Period = 'week' | 'month' | 'quarter' | 'year' | 'custom'
+
+const PERIOD_OPTIONS: { key: Period; label: string; short: string }[] = [
+  { key: 'week',    label: 'Esta semana',   short: 'últimos 7 días' },
+  { key: 'month',   label: 'Este mes',      short: 'últimos 30 días' },
+  { key: 'quarter', label: 'Trimestre',     short: 'últimos 3 meses' },
+  { key: 'year',    label: 'Año',           short: 'últimos 12 meses' },
+  { key: 'custom',  label: 'Personalizado', short: 'rango personalizado' },
+]
 
 const css = `
   * { box-sizing: border-box; }
@@ -234,6 +244,43 @@ const css = `
   .facility-tag.premium { background:#fdf7e6; border-color:#f0d060; color:#8a6a00; }
   .facility-tag.exclusive { background:#eef0fd; border-color:#b0b8f0; color:#3a4ab0; }
   .cat-shift-note { background:#F2F7F9; border-radius:10px; padding:12px 16px; margin-bottom:20px; font-size:12px; color:#5a7a84; }
+
+  /* ── Period filter ── */
+  .period-bar {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .period-label { font-size: 11px; font-weight: 700; color: #5a7a84; text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px; }
+  .period-btn {
+    padding: 7px 16px; border-radius: 20px; cursor: pointer;
+    font-size: 12px; font-weight: 500; color: #5a7a84;
+    border: 1.5px solid #dde8ec; background: #fff; font-family: inherit; transition: all 0.15s;
+  }
+  .period-btn:hover { border-color: #86D2AC; color: #104455; }
+  .period-btn.active { background: #104455; color: #fff; border-color: #104455; font-weight: 600; }
+  .period-btn.refetching { opacity: 0.6; cursor: wait; }
+  .custom-range {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    background: #fff; border: 1.5px solid #dde8ec; border-radius: 12px; padding: 6px 14px;
+  }
+  .custom-range-label { font-size: 11px; color: #5a7a84; font-weight: 600; }
+  .custom-input {
+    border: 1px solid #dde8ec; border-radius: 8px; padding: 4px 10px;
+    font-size: 12px; font-family: inherit; color: #104455; background: #F2F7F9; outline: none;
+  }
+  .custom-input:focus { border-color: #86D2AC; }
+  .apply-btn {
+    padding: 5px 14px; border-radius: 8px; cursor: pointer;
+    font-size: 12px; font-weight: 600; color: #fff;
+    border: none; background: #104455; font-family: inherit; transition: opacity 0.15s;
+  }
+  .apply-btn:hover { opacity: 0.85; }
+  .apply-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .refetch-indicator {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; color: #86D2AC; font-weight: 500;
+  }
+  .refetch-spinner { width: 12px; height: 12px; border: 2px solid rgba(134,210,172,0.3); border-top-color: #86D2AC; border-radius: 50%; animation: spin 0.7s linear infinite; }
 
   /* ── States ── */
   .loading { display:flex; align-items:center; justify-content:center; min-height:300px; color:#5a7a84; font-size:15px; gap:10px; }
@@ -564,16 +611,36 @@ export default function LoyaltyPage() {
   const [data, setData] = useState<LoyaltyData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [refetching, setRefetching] = useState(false)
   const [cluster, setCluster] = useState('ENF')
   const [view, setView] = useState<'ranking' | 'retos' | 'beneficios' | 'turnos' | 'urgentes'>('ranking')
+  const [period, setPeriod] = useState<Period>('year')
+  const [customFrom, setCustomFrom] = useState('')
+  const today = new Date().toISOString().slice(0, 10)
+  const [customTo, setCustomTo] = useState(today)
+  const abortRef = useRef<AbortController | null>(null)
 
-  useEffect(() => {
-    fetch('/api/loyalty')
+  const fetchData = useCallback((p: Period, from?: string, to?: string, isInitial = false) => {
+    abortRef.current?.abort()
+    const ctrl = new AbortController()
+    abortRef.current = ctrl
+    if (isInitial) setLoading(true); else setRefetching(true)
+    setError(null)
+    let url = `/api/loyalty?period=${p}`
+    if (p === 'custom' && from && to) url += `&from=${from}&to=${to}`
+    fetch(url, { signal: ctrl.signal })
       .then((r) => r.json())
       .then((d) => { if (d.error) setError(d.error); else setData(d) })
-      .catch(() => setError('No se pudo conectar con Metabase'))
-      .finally(() => setLoading(false))
+      .catch((e) => { if (e.name !== 'AbortError') setError('No se pudo conectar con Metabase') })
+      .finally(() => { setLoading(false); setRefetching(false) })
   }, [])
+
+  useEffect(() => { fetchData('year', undefined, undefined, true) }, [fetchData])
+
+  const handlePeriod = (p: Period) => {
+    setPeriod(p)
+    if (p !== 'custom') fetchData(p)
+  }
 
   const allStats     = data?.stats ?? []
   const allConsistent = data?.consistent ?? []
@@ -585,6 +652,10 @@ export default function LoyaltyPage() {
   const monthlyCluster = (data?.monthlyPros ?? []).filter((p) => p.category_code === cluster)
   const urgentCluster  = (data?.urgent ?? []).filter((p) => p.category_code === cluster)
   const urgentStat     = data?.urgentStats?.find((s) => s.category_code === cluster)
+
+  const periodShort = period === 'custom' && customFrom && customTo
+    ? `${customFrom} – ${customTo}`
+    : (PERIOD_OPTIONS.find(p => p.key === period)?.short ?? 'últimos 12 meses')
 
   const totalPros     = allStats.reduce((a, s) => a + Number(s.active_pros), 0)
   const totalShifts   = allStats.reduce((a, s) => a + Number(s.total_shifts), 0)
@@ -642,7 +713,7 @@ export default function LoyaltyPage() {
           </div>
         </div>
         <div className="header-meta">
-          {data && <>Actualizado: {fmtDate(data.fetchedAt)}<br />Datos: últimos 12 meses · 1 LP = 1 turno base</>}
+          {data && <>Actualizado: {fmtDate(data.fetchedAt)}<br />Período: {periodShort} · 1 LP = 1 turno base</>}
         </div>
       </header>
 
@@ -663,7 +734,7 @@ export default function LoyaltyPage() {
               <div className="summary-card">
                 <div className="summary-card-label">Turnos Completados</div>
                 <div className="summary-card-value">{fmt(totalShifts)}</div>
-                <div className="summary-card-sub">últimos 12 meses</div>
+                <div className="summary-card-sub">{periodShort}</div>
               </div>
               <div className="summary-card">
                 <div className="summary-card-label">Ingresos Totales Pros</div>
@@ -675,6 +746,47 @@ export default function LoyaltyPage() {
                 <div className="summary-card-value">{fmt(allConsistent.length)}</div>
                 <div className="summary-card-sub">≥ 2 turnos/semana</div>
               </div>
+            </div>
+
+            {/* ── Period filter ── */}
+            <div className="period-bar">
+              <span className="period-label">Período</span>
+              {PERIOD_OPTIONS.map((opt) => (
+                <button
+                  key={opt.key}
+                  className={`period-btn${period === opt.key ? ' active' : ''}${refetching ? ' refetching' : ''}`}
+                  onClick={() => handlePeriod(opt.key)}
+                  disabled={refetching}
+                >
+                  {opt.label}
+                </button>
+              ))}
+              {period === 'custom' && (
+                <div className="custom-range">
+                  <span className="custom-range-label">Del</span>
+                  <input
+                    type="date" className="custom-input" value={customFrom} max={customTo || today}
+                    onChange={(e) => setCustomFrom(e.target.value)}
+                  />
+                  <span className="custom-range-label">Al</span>
+                  <input
+                    type="date" className="custom-input" value={customTo} min={customFrom} max={today}
+                    onChange={(e) => setCustomTo(e.target.value)}
+                  />
+                  <button
+                    className="apply-btn"
+                    disabled={!customFrom || !customTo || refetching}
+                    onClick={() => fetchData('custom', customFrom, customTo)}
+                  >
+                    Aplicar
+                  </button>
+                </div>
+              )}
+              {refetching && (
+                <span className="refetch-indicator">
+                  <span className="refetch-spinner" /> Actualizando…
+                </span>
+              )}
             </div>
 
             {/* ── Cluster tabs ── */}
@@ -716,7 +828,7 @@ export default function LoyaltyPage() {
                 <div className="stat-card">
                   <div className="stat-label">Turnos Completados</div>
                   <div className="stat-value">{fmt(Number(clusterStats.total_shifts))}</div>
-                  <div className="stat-hint">últimos 12 meses</div>
+                  <div className="stat-hint">{periodShort}</div>
                 </div>
                 <div className="stat-card">
                   <div className="stat-label">Media por Turno</div>
@@ -733,7 +845,7 @@ export default function LoyaltyPage() {
 
             {/* ── Tier distribution (always) ── */}
             <div className="section-title">Distribución por Tier</div>
-            <div className="section-sub">Tiers basados en Livo Points (LP). 1 turno base = 10 LP · +2 LP finde · +3 LP noche · ×1.2 si ⚡ Consistente</div>
+            <div className="section-sub">Tiers basados en Livo Points (LP) · {periodShort}. 1 turno base = 10 LP · +2 LP finde · +3 LP noche · ×1.2 si ⚡ Consistente</div>
             <div className="tiers-grid">
               {tierBreakdown.map((tier) => {
                 const total = tierBreakdown.reduce((a, t) => a + t.count, 0)
@@ -756,7 +868,7 @@ export default function LoyaltyPage() {
             {view === 'ranking' && (
               <>
                 <div className="section-title">Ranking por Livo Points</div>
-                <div className="section-sub">LP incluye multiplicadores por turnos de fin de semana, nocturnos y bono de consistencia.</div>
+                <div className="section-sub">LP incluye multiplicadores por turnos de fin de semana, nocturnos y bono de consistencia · {periodShort}.</div>
                 <div className="leaderboard">
                   <div className="lb-header">
                     <span>#</span><span>Profesional</span>
@@ -949,7 +1061,7 @@ export default function LoyaltyPage() {
                   <div className="urgent-banner-tag">⚡ Datos reales · últimos 12 meses</div>
                   <div className="urgent-banner-title">Ranking de Turnos Urgentes</div>
                   <div className="urgent-banner-sub">
-                    Profesionales que cubren turnos marcados como urgentes en la plataforma.
+                    Profesionales que cubren turnos marcados como urgentes en la plataforma · {periodShort}.
                     Estos turnos suelen llevar bono Livo y son críticos para las instalaciones.
                   </div>
                   {urgentStat ? (
@@ -1019,7 +1131,7 @@ export default function LoyaltyPage() {
 
                     {/* Leaderboard */}
                     <div className="section-title">Ranking completo — Turnos Urgentes</div>
-                    <div className="section-sub">Ordenado por número de turnos urgentes cubiertos en los últimos 12 meses.</div>
+                    <div className="section-sub">Ordenado por número de turnos urgentes cubiertos · {periodShort}.</div>
                     <div className="urgent-lb">
                       <div className="urgent-lb-header">
                         <span>#</span>
