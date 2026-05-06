@@ -245,6 +245,52 @@ const css = `
   .facility-tag.exclusive { background:#eef0fd; border-color:#b0b8f0; color:#3a4ab0; }
   .cat-shift-note { background:#F2F7F9; border-radius:10px; padding:12px 16px; margin-bottom:20px; font-size:12px; color:#5a7a84; }
 
+  /* ── Annual Prize ── */
+  .prize-section { margin-bottom: 28px; }
+  .prize-hero {
+    background: linear-gradient(135deg, #1a1205, #3b2a06, #6b4c0a);
+    border-radius: 16px; padding: 24px 28px; margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    box-shadow: 0 4px 24px rgba(202,138,4,0.2); position: relative; overflow: hidden;
+  }
+  .prize-hero::before { content:'🏆'; position:absolute; right:24px; top:50%; transform:translateY(-50%); font-size:90px; opacity:0.06; pointer-events:none; }
+  .prize-hero-tag { font-size:10px; font-weight:700; color:#fbbf24; text-transform:uppercase; letter-spacing:1.2px; margin-bottom:6px; }
+  .prize-hero-title { font-size:20px; font-weight:700; color:#fff; margin-bottom:5px; }
+  .prize-hero-sub { font-size:12px; color:rgba(255,255,255,0.55); line-height:1.6; max-width:480px; }
+  .prize-hero-leader {
+    flex-shrink:0; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12);
+    border-radius:14px; padding:14px 20px; text-align:center; min-width:200px;
+  }
+  .prize-hero-leader-label { font-size:10px; color:#fbbf24; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px; }
+  .prize-hero-leader-name { font-size:15px; font-weight:700; color:#fff; margin-bottom:4px; }
+  .prize-hero-leader-shifts { font-size:11px; color:rgba(255,255,255,0.5); margin-bottom:10px; }
+  .prize-hero-leader-prize {
+    display:inline-flex; align-items:center; gap:5px; font-size:13px; font-weight:700;
+    padding:5px 14px; border-radius:20px; background:var(--pc); color:#fff;
+  }
+
+  .prize-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:14px; }
+  .prize-card {
+    background:#fff; border-radius:16px; padding:20px;
+    box-shadow:0 2px 12px rgba(16,68,85,0.06);
+    border-top:4px solid var(--pc); position:relative;
+  }
+  .prize-card.current-leader { box-shadow:0 4px 20px rgba(0,0,0,0.12); transform:translateY(-3px); }
+  .prize-card-level { display:flex; align-items:center; gap:6px; font-size:16px; font-weight:800; color:var(--pc); margin-bottom:3px; }
+  .prize-card-req { font-size:11px; color:#9db5bc; margin-bottom:16px; }
+  .prize-card-rows { display:flex; flex-direction:column; gap:9px; }
+  .prize-card-row { display:flex; justify-content:space-between; align-items:center; padding:7px 10px; border-radius:8px; background:#F2F7F9; }
+  .prize-card-row-label { font-size:10px; font-weight:600; color:#5a7a84; text-transform:uppercase; letter-spacing:0.3px; }
+  .prize-card-row-val { font-size:13px; font-weight:700; color:#104455; }
+  .prize-card-pct { font-size:22px; font-weight:800; color:var(--pc); text-align:center; margin-top:12px; line-height:1; }
+  .prize-card-pct-label { font-size:10px; color:#9db5bc; text-align:center; margin-top:2px; }
+  .prize-card-current-badge {
+    position:absolute; top:-10px; left:50%; transform:translateX(-50%);
+    background:var(--pc); color:#fff; font-size:9px; font-weight:700;
+    padding:3px 10px; border-radius:10px; white-space:nowrap; letter-spacing:0.3px;
+  }
+  .prize-note { font-size:11px; color:#9db5bc; text-align:center; padding:4px 0; }
+
   /* ── Marketplace ── */
   .market-banner {
     background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
@@ -523,6 +569,21 @@ const CLUSTERS = [
   { code: 'TCAE', label: 'TCAE',       icon: '🏥'   },
   { code: 'DOC',  label: 'Doctores',   icon: '👨‍⚕️' },
 ]
+
+// ─── Annual Prize ─────────────────────────────────────────────────────────────
+const ANNUAL_PRIZES = [
+  { level: 'Bronze',  minShifts: 25, revenue: 5000,  budget: 1000, pct: 20, color: '#b45309', bg: '#fef3c7', icon: '🥉' },
+  { level: 'Plata',   minShifts: 50, revenue: 10000, budget: 2500, pct: 25, color: '#4b5563', bg: '#f3f4f6', icon: '🥈' },
+  { level: 'Oro',     minShifts: 75, revenue: 15000, budget: 4500, pct: 30, color: '#ca8a04', bg: '#fefce8', icon: '🥇' },
+  { level: 'Platino', minShifts: 90, revenue: 18000, budget: 6300, pct: 35, color: '#7c3aed', bg: '#f5f3ff', icon: '💎' },
+]
+
+function getAnnualPrize(shifts: number) {
+  for (let i = ANNUAL_PRIZES.length - 1; i >= 0; i--) {
+    if (shifts >= ANNUAL_PRIZES[i].minShifts) return ANNUAL_PRIZES[i]
+  }
+  return null
+}
 
 // ─── Marketplace ───────────────────────────────────────────────────────────────
 type MarketItem = {
@@ -1009,6 +1070,70 @@ export default function LoyaltyPage() {
             {/* ══════════ VIEW: RANKING ══════════ */}
             {view === 'ranking' && (
               <>
+                {/* ── Annual Prize ── */}
+                {(() => {
+                  const leader = prosWithLP[0]
+                  const leaderShifts = leader ? Number(leader.shifts_completed) : 0
+                  const leaderPrize = leader ? getAnnualPrize(leaderShifts) : null
+                  return (
+                    <div className="prize-section">
+                      <div className="prize-hero">
+                        <div>
+                          <div className="prize-hero-tag">🏆 Premio Anual · Clasificación Final</div>
+                          <div className="prize-hero-title">Top #1 del Año — Recompensa por Actividad</div>
+                          <div className="prize-hero-sub">
+                            El profesional con más turnos completados al cierre del período anual recibe un presupuesto de recompensa basado en el revenue generado. Cuantos más turnos, mayor el nivel y el premio.
+                          </div>
+                        </div>
+                        {leader && (
+                          <div className="prize-hero-leader">
+                            <div className="prize-hero-leader-label">Líder actual · {cluster}</div>
+                            <div className="prize-hero-leader-name">{leader.first_name} {leader.last_name}</div>
+                            <div className="prize-hero-leader-shifts">{fmt(leaderShifts)} turnos · {periodShort}</div>
+                            {leaderPrize ? (
+                              <div className="prize-hero-leader-prize" style={{ '--pc': leaderPrize.color } as React.CSSProperties}>
+                                {leaderPrize.icon} {leaderPrize.level} — {fmtEur(leaderPrize.budget)}
+                              </div>
+                            ) : (
+                              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Aún sin nivel (mín. 25 turnos)</div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="prize-grid">
+                        {ANNUAL_PRIZES.map((p) => {
+                          const isCurrentLeader = leaderPrize?.level === p.level
+                          const nextPrize = ANNUAL_PRIZES.find(x => x.minShifts > leaderShifts)
+                          const isNext = !leaderPrize && nextPrize?.level === p.level || (leaderPrize && nextPrize?.level === p.level)
+                          return (
+                            <div key={p.level}
+                              className={`prize-card${isCurrentLeader ? ' current-leader' : ''}`}
+                              style={{ '--pc': p.color } as React.CSSProperties}>
+                              {isCurrentLeader && <div className="prize-card-current-badge">⭐ Líder actual</div>}
+                              <div className="prize-card-level">{p.icon} {p.level}</div>
+                              <div className="prize-card-req">≥ {p.minShifts} turnos completados</div>
+                              <div className="prize-card-rows">
+                                <div className="prize-card-row">
+                                  <span className="prize-card-row-label">Revenue</span>
+                                  <span className="prize-card-row-val">{fmtEur(p.revenue)}</span>
+                                </div>
+                                <div className="prize-card-row">
+                                  <span className="prize-card-row-label">Presupuesto</span>
+                                  <span className="prize-card-row-val" style={{ color: p.color }}>{fmtEur(p.budget)}</span>
+                                </div>
+                              </div>
+                              <div className="prize-card-pct">{p.pct}%</div>
+                              <div className="prize-card-pct-label">del revenue en recompensa</div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                      <div className="prize-note">* El nivel se determina por el nº de turnos completados por el #1 al cierre del período anual · Revenue calculado como referencia a 90 turnos para Platino</div>
+                    </div>
+                  )
+                })()}
+
                 <div className="section-title">Ranking por Livo Points</div>
                 <div className="section-sub">LP incluye multiplicadores por turnos de fin de semana, nocturnos y bono de consistencia · {periodShort}.</div>
                 <div className="leaderboard">
