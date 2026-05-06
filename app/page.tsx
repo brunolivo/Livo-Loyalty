@@ -36,16 +36,18 @@ const css = `
   .container { max-width: 1200px; margin: 0 auto; padding: 28px 24px; }
 
   /* ── Summary bar ── */
-  .summary-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 28px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-bottom: 28px; }
   .summary-card {
     background: #fff; border-radius: 14px; padding: 18px 20px;
     box-shadow: 0 2px 12px rgba(16,68,85,0.06); border-left: 4px solid #86D2AC;
   }
   .summary-card.orange { border-left-color: #ff6b35; }
+  .summary-card.gold { border-left-color: #ca8a04; }
   .summary-card-label { font-size: 11px; color: #5a7a84; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
   .summary-card-value { font-size: 26px; font-weight: 700; color: #104455; line-height: 1; }
   .summary-card-sub { font-size: 11px; color: #86D2AC; margin-top: 4px; font-weight: 500; }
   .summary-card.orange .summary-card-sub { color: #ff6b35; }
+  .summary-card.gold .summary-card-sub { color: #ca8a04; }
 
   /* ── Cluster tabs ── */
   .tabs { display: flex; gap: 0; margin-bottom: 20px; background: #fff; border-radius: 14px; padding: 5px; box-shadow: 0 2px 12px rgba(16,68,85,0.06); width: fit-content; }
@@ -998,6 +1000,22 @@ export default function LoyaltyPage() {
                 <div className="summary-card-label">⚡ Pros Consistentes</div>
                 <div className="summary-card-value">{fmt(allConsistent.length)}</div>
                 <div className="summary-card-sub">≥ 2 turnos/semana</div>
+              </div>
+              <div className="summary-card gold">
+                <div className="summary-card-label">🏆 Premio Total a Pagar</div>
+                <div className="summary-card-value" style={{ fontSize: 20 }}>
+                  {fmtEur(
+                    CLUSTERS.reduce((total, c) => {
+                      const pros = (data?.leaderboard ?? []).filter(p => p.category_code === c.code)
+                      return total + ANNUAL_PRIZES.reduce((lvlTotal, prize, i) => {
+                        const nextMin = ANNUAL_PRIZES[i + 1]?.minShifts ?? Infinity
+                        const count = pros.filter(p => Number(p.shifts_completed) >= prize.minShifts && Number(p.shifts_completed) < nextMin).length
+                        return lvlTotal + count * getPrizeBudget(prize, c.code)
+                      }, 0)
+                    }, 0)
+                  )}
+                </div>
+                <div className="summary-card-sub">todos los niveles · ENF + TCAE + DOC</div>
               </div>
             </div>
 
